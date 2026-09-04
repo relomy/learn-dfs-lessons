@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 2: Define the input contract</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 2 · DFS analytics architecture</p>
+  <h1>Define the input contract</h1>
+  <p class="dek">A file can be valid CSV and still be unusable for our domain.</p>
+
+  <h2>The idea</h2>
+  <p>An input contract records what a source gives us, what the values mean, and what quality the system expects. It is the agreement at the boundary between a source adapter and the rest of the system.</p>
+  <p>The DraftKings file has ten columns, but that does not mean all ten should become fields on every domain object. Some identify the source, some describe a slate entry, and some may be unnecessary for the first slice.</p>
+
+  <div class="card">
+    <strong>Our first-slice promise:</strong><br>
+    Given a DraftKings NFL main-slate salary file, produce a valid available QB pool sorted by salary. Do not produce a ranking yet.
+  </div>
+
+  <h2>Your exercise</h2>
+  <p>Classify each field below as <strong>required</strong>, <strong>useful but not required</strong>, <strong>source metadata</strong>, <strong>derived</strong>, or <strong>not needed yet</strong>.</p>
+  <ul>
+    <li><code>Position</code></li>
+    <li><code>Name + ID</code></li>
+    <li><code>Name</code></li>
+    <li><code>ID</code></li>
+    <li><code>Roster Position</code></li>
+    <li><code>Salary</code></li>
+    <li><code>Game Info</code></li>
+    <li><code>TeamAbbrev</code></li>
+    <li><code>AvgPointsPerGame</code></li>
+    <li><code>Status</code></li>
+  </ul>
+  <p>Then answer:</p>
+  <ol>
+    <li>What should happen if a required field is missing?</li>
+    <li>What should happen if one row has a malformed salary or game description?</li>
+    <li>Which values should be copied into the domain model, and which should be translated first?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://www.rfc-editor.org/info/rfc4180/">RFC 4180</a> for the basic CSV conventions. The goal is not to memorize the specification. Notice the difference between the file format and the meaning our application assigns to each field.</p>
+
+  <h2>Done when</h2>
+  <p>You can justify every classification and describe the system’s response to invalid input.</p>
+  <p class="small">Reply with your classifications and answers. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../reference/input-contract.html">Input contract quick reference</a></p>
+</main>
+</body>
+</html>
