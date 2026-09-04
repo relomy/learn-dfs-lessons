@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 6: Make the domain executable</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 6 · DFS analytics architecture</p>
+  <h1>Make the domain executable</h1>
+  <p class="dek">Turn the model’s rules into a small, testable first slice.</p>
+
+  <h2>The idea</h2>
+  <p>A model becomes useful when its rules can be exercised. Start with a narrow path through the system: one raw row becomes one <code>Player</code> and one <code>SlatePlayer</code>, or is rejected with a reason. Keep the path small enough that every transformation is visible.</p>
+
+  <div class="card">
+    <strong>Vertical slice:</strong><br>
+    One thin path through the boundary that proves the important pieces work together.
+  </div>
+
+  <h2>One possible flow</h2>
+  <pre><code>raw row
+  → parse source fields
+  → create Player
+  → create SlatePlayer
+  → accepted, or rejected with a reason</code></pre>
+  <p>The adapter should be responsible for translation. The domain object should be responsible for protecting its invariants. A test can then prove both the happy path and a meaningful rejection without testing every possible CSV variation.</p>
+
+  <h2>Your exercise</h2>
+  <ol>
+    <li>Write pseudocode for creating one valid <code>SlatePlayer</code> from a raw row.</li>
+    <li>Choose two malformed rows and state whether each is rejected by the adapter or refused by the domain model.</li>
+    <li>Write three test names that would demonstrate the first slice works.</li>
+    <li>Identify one piece of behavior that should not be included yet.</li>
+  </ol>
+  <p>Keep sorting and quarterback selection outside this exercise. The goal is to prove the translation and domain rules before adding use-case behavior.</p>
+
+  <h2>Primary source</h2>
+  <p>Read the <a href="https://docs.python.org/3/library/unittest.html">Python <code>unittest</code> documentation</a> with one question in mind: what is the smallest test that gives us useful feedback about the domain?</p>
+
+  <h2>Done when</h2>
+  <p>You can trace one row from source input to a valid domain object, explain where invalid data is stopped, and name a test that would catch a broken invariant.</p>
+  <p class="small">Reply with your flow, rejection examples, and test names. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../reference/domain-modeling.html">Domain modeling quick reference</a> · <a href="../lessons/0005-model-values-and-invariants.html">Lesson 5</a></p>
+</main>
+</body>
+</html>
