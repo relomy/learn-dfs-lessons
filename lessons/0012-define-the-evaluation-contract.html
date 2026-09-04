@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 12: Define the evaluation contract</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 12 · DFS analytics architecture</p>
+  <h1>Define the evaluation contract</h1>
+  <p class="dek">Make the scoring policy’s inputs and outputs explicit.</p>
+
+  <h2>The idea</h2>
+  <p>Before adding formulas, define what an evaluation policy needs and what it promises to return. This contract prevents a scoring rule from quietly reaching into CSV rows, making undocumented assumptions, or confusing missing data with a zero value.</p>
+
+  <div class="card">
+    <strong>Contract question:</strong><br>
+    What must be known to evaluate this player, and what does the caller receive when that information is unavailable?
+  </div>
+
+  <h2>Separate the data roles</h2>
+  <ul>
+    <li><strong>Raw source data:</strong> provider-shaped values such as CSV strings and column names.</li>
+    <li><strong>Domain facts:</strong> translated values such as salary, matchup, and availability.</li>
+    <li><strong>Evaluation inputs:</strong> the selected facts and statistics the policy actually needs.</li>
+    <li><strong>Evaluation result:</strong> a domain-owned score, rating, or explicit “not evaluable” outcome.</li>
+  </ul>
+  <p>Missing data is a modeling decision. Treating an unknown statistic as zero may produce a valid number with an invalid meaning. The contract should make that choice visible.</p>
+
+  <h2>Contract diagram</h2>
+  <pre><code>SlatePlayer + evaluation inputs
+              ↓
+      evaluation policy
+              ↓
+   evaluation result or
+      not evaluable</code></pre>
+
+  <h2>Transfer quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>What should an evaluation policy receive?</p>
+      <p>A. Domain-owned inputs &nbsp; B. Raw CSV rows &nbsp; C. UI controls</p>
+    </li>
+    <li>
+      <p>What should a missing required statistic become?</p>
+      <p>A. Always zero &nbsp; B. An explicit outcome &nbsp; C. A hidden exception</p>
+    </li>
+    <li>
+      <p>Who should decide which statistics the policy needs?</p>
+      <p>A. Evaluation design &nbsp; B. CSV library &nbsp; C. Browser client</p>
+    </li>
+    <li>
+      <p>Which result is safest when required data is absent?</p>
+      <p>A. Not evaluable &nbsp; B. Random score &nbsp; C. Silent omission</p>
+    </li>
+    <li>
+      <p>Why define the contract before the formula?</p>
+      <p>A. Clarify assumptions &nbsp; B. Avoid all validation &nbsp; C. Guarantee rankings</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/eaaCatalog/dataTransferObject.html">Martin Fowler’s description of Data Transfer Objects</a> with one question in mind: which data shape belongs at a boundary, and which shape belongs inside the application?</p>
+
+  <h2>Done when</h2>
+  <p>You can state the evaluation policy’s inputs and outputs, explain why missing data needs an explicit decision, and distinguish a data contract from a provider’s raw format.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0011-model-quarterback-evaluation.html">Lesson 11</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
