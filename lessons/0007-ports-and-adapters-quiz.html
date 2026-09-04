@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 7: Ports and adapters quiz</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 7 · DFS analytics architecture</p>
+  <h1>Ports and adapters quiz</h1>
+  <p class="dek">Retrieve the boundary ideas before adding another source.</p>
+
+  <h2>Quick context</h2>
+  <p>An adapter translates between the application and an external system. A port is the application-owned boundary that describes what the application needs, without naming DraftKings or another provider. Together, they make the source replaceable at the edge.</p>
+
+  <div class="card">
+    <strong>Dependency direction:</strong><br>
+    The application defines the need; an external adapter satisfies it.
+  </div>
+
+  <h2>Quiz</h2>
+  <p>Reply with only your choices first, in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Then explain whichever answer felt least certain.</p>
+
+  <ol>
+    <li>
+      <p>Which boundary should mention DraftKings column names?</p>
+      <p>A. Domain model &nbsp; B. Source adapter &nbsp; C. Use case</p>
+    </li>
+    <li>
+      <p>What does a port describe?</p>
+      <p>A. Provider format &nbsp; B. Application need &nbsp; C. Storage schema</p>
+    </li>
+    <li>
+      <p>Which change should ideally require only adapter changes?</p>
+      <p>A. Provider renames a column &nbsp; B. Ranking rule changes &nbsp; C. Salary rule changes</p>
+    </li>
+    <li>
+      <p>Who should translate a raw status such as <code>Q</code>?</p>
+      <p>A. Source adapter &nbsp; B. Domain consumer &nbsp; C. Presentation layer</p>
+    </li>
+    <li>
+      <p>Why define a port in application-owned language?</p>
+      <p>A. To hide dependencies &nbsp; B. To preserve columns &nbsp; C. To avoid models</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://alistair.cockburn.us/hexagonal-architecture/">Alistair Cockburn’s description of hexagonal architecture</a> and look for the distinction between the application inside the boundary and technologies outside it.</p>
+
+  <h2>Done when</h2>
+  <p>You can identify the port, adapter, domain, and use case in a small architecture diagram and explain which direction the dependency should point.</p>
+  <p class="small">Reply with your choices and confidence. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0006-make-the-domain-executable.html">Lesson 6</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
