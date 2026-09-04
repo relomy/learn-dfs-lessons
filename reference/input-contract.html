@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Input contracts: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <h1>Input contracts</h1>
+  <p class="dek">An input contract says what a source promises and what our system requires.</p>
+  <h2>A contract covers</h2>
+  <ul>
+    <li>shape: which fields exist;</li>
+    <li>meaning: what each field represents;</li>
+    <li>quality: valid types, values, and completeness;</li>
+    <li>freshness: when the data describes; and</li>
+    <li>failure behavior: what happens when the promise is broken.</li>
+  </ul>
+  <h2>Four useful categories</h2>
+  <ul>
+    <li><strong>Required:</strong> without it, the system cannot create a valid entry.</li>
+    <li><strong>Optional:</strong> useful when present, but not needed for the current behavior.</li>
+    <li><strong>Source metadata:</strong> needed to interpret or audit the input, but not part of the domain result.</li>
+    <li><strong>Derived:</strong> calculated by our system rather than copied from the source.</li>
+  </ul>
+  <p class="small">Primary reading: <a href="https://www.rfc-editor.org/info/rfc4180/">RFC 4180</a>.</p>
+</main>
+</body>
+</html>
