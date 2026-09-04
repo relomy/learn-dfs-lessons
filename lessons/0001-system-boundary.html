@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 1: Draw the system boundary</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 1 · DFS analytics architecture</p>
+  <h1>Draw the system boundary</h1>
+  <p class="dek">Before choosing modules, classes, or databases, decide what the system promises to do.</p>
+
+  <h2>The idea</h2>
+  <p>A system boundary separates responsibilities. Inside the boundary, our system owns decisions and rules. Outside it, sources and users interact with the system through defined inputs and outputs.</p>
+  <p>For this project, the first boundary is likely between external NFL data sources, our evaluation process, and the people who want a slate ranking.</p>
+
+  <div class="card">
+    <strong>Our current candidate:</strong><br>
+    The system acquires data for one NFL DFS slate, combines the relevant data, evaluates eligible players with a position-specific scoring model, and returns ranked players.
+  </div>
+
+  <h2>Your decision</h2>
+  <p>Write a one-paragraph description of the first version. Include:</p>
+  <ol>
+    <li>what starts the process;</li>
+    <li>what information the system acquires;</li>
+    <li>what the system calculates; and</li>
+    <li>what a user receives at the end.</li>
+  </ol>
+
+  <h2>Do not solve yet</h2>
+  <p>Do not choose Python, an API framework, a database, or a folder structure. Those choices become easier after we know what the system must own.</p>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/bliki/BoundedContext.html">Martin Fowler’s explanation of bounded contexts</a>. For now, focus on the idea that a model is valid within a particular boundary.</p>
+
+  <p class="small">Reply with your paragraph and any questions. We will challenge the boundary together before naming the domain concepts.</p>
+  <p><a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
