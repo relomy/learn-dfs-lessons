@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 11: Model quarterback evaluation</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 11 · DFS analytics architecture</p>
+  <h1>Model quarterback evaluation</h1>
+  <p class="dek">Give the first domain behavior a clear home.</p>
+
+  <h2>The idea</h2>
+  <p>Loading players and evaluating players are different application concerns. A use case coordinates the work; a domain policy explains how an evaluation is calculated. Keeping that distinction clear lets scoring rules evolve without making the source adapter responsible for them.</p>
+
+  <div class="card">
+    <strong>Start small:</strong><br>
+    One explicit quarterback scoring policy is more valuable than an abstraction for every future position.
+  </div>
+
+  <h2>Separate the responsibilities</h2>
+  <ul>
+    <li><strong>Source adapter:</strong> obtains and translates slate facts.</li>
+    <li><strong>Use case:</strong> chooses the players to evaluate, supplies the required inputs, and presents the result.</li>
+    <li><strong>Evaluation policy:</strong> applies the rules that turn domain facts into an evaluation.</li>
+  </ul>
+  <p>For now, “evaluation” can remain deliberately simple—for example, a transparent formula using available statistics. The important design decision is who owns the meaning of that formula.</p>
+
+  <h2>Responsibility diagram</h2>
+  <pre><code>PlayerSource → use case → quarterback evaluation policy
+                  │                    │
+              selects inputs       applies scoring rules
+                  └──────────────→ evaluation result</code></pre>
+
+  <h2>Scenario quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>Where should a formula for quarterback points belong?</p>
+      <p>A. Evaluation policy &nbsp; B. CSV adapter &nbsp; C. Composition root</p>
+    </li>
+    <li>
+      <p>What should the use case primarily coordinate?</p>
+      <p>A. CSV syntax &nbsp; B. Player selection and evaluation &nbsp; C. Provider status codes</p>
+    </li>
+    <li>
+      <p>What should the first scoring design prefer?</p>
+      <p>A. Explicit simple rules &nbsp; B. Complete position hierarchy &nbsp; C. Dynamic plugin system</p>
+    </li>
+    <li>
+      <p>Which change should not require editing the source adapter?</p>
+      <p>A. Change scoring formula &nbsp; B. Rename CSV column &nbsp; C. Change status mapping</p>
+    </li>
+    <li>
+      <p>When is a separate strategy abstraction justified?</p>
+      <p>A. After meaningful variation appears &nbsp; B. Before any rule exists &nbsp; C. Whenever a class has fields</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/eaaCatalog/domainModel.html">Martin Fowler’s description of the Domain Model pattern</a> with one question in mind: where should behavior that represents the problem domain live?</p>
+
+  <h2>Done when</h2>
+  <p>You can distinguish player selection from player evaluation, identify where the scoring rule belongs, and explain why a simple explicit policy is the right starting point.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0010-design-the-first-use-case.html">Lesson 10</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
