@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 9: Test the hexagon</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 9 · DFS analytics architecture</p>
+  <h1>Test the hexagon</h1>
+  <p class="dek">Put each test at the boundary where its knowledge belongs.</p>
+
+  <h2>The idea</h2>
+  <p>Hexagonal architecture is valuable partly because the application can be tested without its external technologies. Each test should know only the boundary it is verifying.</p>
+
+  <div class="card">
+    <strong>Test boundary rule:</strong><br>
+    Test domain rules with domain values, adapters with representative source data, and use cases with substitute ports.
+  </div>
+
+  <h2>Three useful test perspectives</h2>
+  <ul>
+    <li><strong>Domain test:</strong> proves rules such as non-negative salary or valid availability without reading a CSV.</li>
+    <li><strong>Adapter test:</strong> proves a DraftKings row becomes the intended domain values and malformed source data is handled.</li>
+    <li><strong>Use-case test:</strong> supplies a fake <code>PlayerSource</code> and proves application behavior without DraftKings or a file.</li>
+  </ul>
+  <p>An integration test can connect the real pieces and catch wiring or format mismatches. It is useful, but it should not be the only way to discover a broken domain rule.</p>
+
+  <h2>Boundary diagram</h2>
+  <pre><code>domain rule  ←  domain test
+source row   ←  adapter test  →  PlayerSource
+use case     ←  fake source
+full wiring  ←  integration test</code></pre>
+
+  <h2>Scenario quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>Which test should know DraftKings column names?</p>
+      <p>A. Domain test &nbsp; B. Adapter test &nbsp; C. Use-case test</p>
+    </li>
+    <li>
+      <p>How should a use case get source data in isolation?</p>
+      <p>A. Read a CSV &nbsp; B. Use a fake port &nbsp; C. Call DraftKings</p>
+    </li>
+    <li>
+      <p>What does an integration test primarily check?</p>
+      <p>A. Component wiring &nbsp; B. One enum rule &nbsp; C. One string parse</p>
+    </li>
+    <li>
+      <p>Where should a negative-salary rule be tested?</p>
+      <p>A. Domain test &nbsp; B. Adapter test &nbsp; C. Browser test</p>
+    </li>
+    <li>
+      <p>If DraftKings renames a column, which test should likely fail first?</p>
+      <p>A. Adapter test &nbsp; B. Domain test &nbsp; C. Ranking test</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://alistair.cockburn.us/hexagonal-architecture/">Cockburn’s original hexagonal architecture article</a> again, focusing on how mock and test adapters allow the application to run independently of external devices and databases.</p>
+
+  <h2>Done when</h2>
+  <p>You can choose a test boundary for a behavior and explain what external knowledge that test should deliberately avoid.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0008-wire-the-adapter.html">Lesson 8</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
