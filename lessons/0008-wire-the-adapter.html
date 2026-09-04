@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 8: Wire the adapter</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 8 · DFS analytics architecture</p>
+  <h1>Wire the adapter</h1>
+  <p class="dek">Keep the application independent while choosing a real source at the edge.</p>
+
+  <h2>The idea</h2>
+  <p>Dependency inversion means the useful application logic does not reach outward to construct or understand a DraftKings client. Instead, the application owns the <code>PlayerSource</code> contract, and an outer layer supplies an implementation of that contract.</p>
+
+  <div class="card">
+    <strong>Composition root:</strong><br>
+    The place where the application is assembled and its concrete dependencies are chosen.
+  </div>
+
+  <h2>Dependency direction</h2>
+  <pre><code>application defines PlayerSource
+          ↑
+DraftKings adapter implements PlayerSource
+          ↑
+composition root chooses the adapter</code></pre>
+  <p>The arrows show who depends on the contract. The use case can ask a <code>PlayerSource</code> for slate players without knowing whether the source is a DraftKings CSV, another provider, or an in-memory test source.</p>
+
+  <h2>Why wiring matters</h2>
+  <p>If the use case constructs the DraftKings adapter itself, provider knowledge has moved inward. If the composition root supplies the dependency, the use case remains focused on its job and the adapter can be swapped without changing application policy.</p>
+
+  <h2>Scenario quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>Who should define <code>PlayerSource</code>?</p>
+      <p>A. Application &nbsp; B. DraftKings &nbsp; C. CSV library</p>
+    </li>
+    <li>
+      <p>Where should the concrete DraftKings adapter usually be selected?</p>
+      <p>A. Domain object &nbsp; B. Composition root &nbsp; C. Value object</p>
+    </li>
+    <li>
+      <p>What should a use case receive?</p>
+      <p>A. CSV path &nbsp; B. DraftKings client &nbsp; C. PlayerSource</p>
+    </li>
+    <li>
+      <p>What makes a fake source useful?</p>
+      <p>A. It satisfies the same port &nbsp; B. It copies every column &nbsp; C. It owns the domain</p>
+    </li>
+    <li>
+      <p>Which change should avoid changing the use case?</p>
+      <p>A. Swap CSV for API &nbsp; B. Change ranking rules &nbsp; C. Add a domain invariant</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/articles/injection.html">Martin Fowler’s explanation of dependency injection</a> with one question in mind: who should decide which concrete implementation the application uses?</p>
+
+  <h2>Done when</h2>
+  <p>You can point to the port, adapter, use case, and composition root in a dependency diagram and explain why the use case does not construct the DraftKings adapter itself.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0007-ports-and-adapters-quiz.html">Lesson 7</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
