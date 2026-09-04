@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 5: Model values and invariants</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 5 · DFS analytics architecture</p>
+  <h1>Model values and invariants</h1>
+  <p class="dek">Make invalid domain states harder to create.</p>
+
+  <h2>The idea</h2>
+  <p>A domain model is more than a bag of strings and numbers. Some values have meaning and rules: a salary is money, a position comes from a known vocabulary, and a matchup has two teams and a kickoff. Modeling those rules explicitly gives the rest of the system safer building blocks.</p>
+
+  <div class="card">
+    <strong>Invariant:</strong><br>
+    A rule that must be true whenever a domain object exists.
+  </div>
+
+  <h2>Possible first-slice values</h2>
+  <ul>
+    <li><strong>Salary:</strong> non-negative currency amount.</li>
+    <li><strong>Position:</strong> one of the positions supported by the domain.</li>
+    <li><strong>Availability:</strong> a domain value such as available, questionable, or unavailable.</li>
+    <li><strong>Matchup:</strong> away team, home team, and scheduled kickoff.</li>
+  </ul>
+  <p>These could begin as ordinary fields with validation in constructors. A dedicated value object is justified when it makes a rule, operation, or boundary clearer—not merely because a noun exists.</p>
+
+  <h2>Your exercise</h2>
+  <ol>
+    <li>Sketch a <code>SlatePlayer</code> with <code>Player</code>, position, salary, matchup, team, and availability.</li>
+    <li>Write three invariants that must hold for every valid <code>SlatePlayer</code>.</li>
+    <li>Choose one field that deserves a value object now, and one that should remain simple for now.</li>
+    <li>For each choice, explain what rule or behavior justifies it.</li>
+  </ol>
+  <p>Do not design a complete hierarchy. Keep the first QB slice small and make the rules visible.</p>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/bliki/ValueObject.html">Martin Fowler’s explanation of Value Objects</a>. Focus on the difference between a value’s identity and the meaning carried by its attributes.</p>
+
+  <h2>Done when</h2>
+  <p>You can state the rules that make a <code>SlatePlayer</code> valid and explain why one value deserves explicit modeling without prematurely abstracting everything.</p>
+  <p class="small">Reply with your sketch, invariants, and modeling choices. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../reference/domain-modeling.html">Domain modeling quick reference</a> · <a href="../lessons/0004-separate-player-from-slate-data.html">Lesson 4</a></p>
+</main>
+</body>
+</html>
