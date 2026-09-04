@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 10: Design the first use case</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 10 · DFS analytics architecture</p>
+  <h1>Design the first use case</h1>
+  <p class="dek">Keep source translation separate from application policy.</p>
+
+  <h2>The idea</h2>
+  <p>A use case coordinates an application goal. It should speak in domain terms, request data through ports, and apply rules that express what the application is trying to accomplish. It should not know CSV headers, file paths, or DraftKings status codes.</p>
+
+  <div class="card">
+    <strong>Responsibility test:</strong><br>
+    Ask whether the rule would still exist if DraftKings disappeared. If yes, it probably belongs in the application or domain rather than the adapter.
+  </div>
+
+  <h2>First-slice responsibilities</h2>
+  <ul>
+    <li><strong>Adapter:</strong> read rows, translate values, and report source-data problems.</li>
+    <li><strong>Use case:</strong> request slate players, apply the first-slice selection policy, and return an application result.</li>
+    <li><strong>Domain:</strong> protect valid values and expose meaningful concepts.</li>
+  </ul>
+  <p>The existing prototype combines source loading with “available quarterbacks ordered by salary.” Lesson 10 asks you to decide which parts are source preparation and which parts are application policy.</p>
+
+  <h2>Responsibility diagram</h2>
+  <pre><code>source adapter → PlayerSource port → use case → application result
+       │                                  │
+   translates rows                 applies policy
+   and statuses                    in domain terms</code></pre>
+
+  <h2>Scenario quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>Where should “DraftKings column is named <code>Game Info</code>” be handled?</p>
+      <p>A. Adapter &nbsp; B. Use case &nbsp; C. Domain</p>
+    </li>
+    <li>
+      <p>Where should “select available quarterbacks” be handled?</p>
+      <p>A. CSV reader &nbsp; B. Use case &nbsp; C. Composition root</p>
+    </li>
+    <li>
+      <p>What should the use case request?</p>
+      <p>A. Raw rows &nbsp; B. DraftKings fields &nbsp; C. SlatePlayers</p>
+    </li>
+    <li>
+      <p>Where should “salary cannot be negative” be protected?</p>
+      <p>A. Domain &nbsp; B. CSV file &nbsp; C. UI adapter</p>
+    </li>
+    <li>
+      <p>What is a warning sign in a use case?</p>
+      <p>A. It knows provider vocabulary &nbsp; B. It calls a port &nbsp; C. It returns domain results</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://alistair.cockburn.us/hexagonal-architecture/">Cockburn’s discussion of use cases and the application boundary</a>, especially the warning against use cases containing intimate knowledge of external technology.</p>
+
+  <h2>Done when</h2>
+  <p>You can classify a rule as adapter, domain, or use-case responsibility and explain why the use case should remain independent of DraftKings vocabulary.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0009-test-the-hexagon.html">Lesson 9</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>
