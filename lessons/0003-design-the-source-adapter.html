@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 3: Design the source adapter</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 3 · DFS analytics architecture</p>
+  <h1>Design the source adapter</h1>
+  <p class="dek">Give the rest of the system a clean boundary, even when the source is messy.</p>
+
+  <h2>The idea</h2>
+  <p>An adapter is a translator at the edge of the system. It knows DraftKings column names, string formats, and status codes. The domain should know players, slate entries, matchups, salaries, and availability—not the quirks of a CSV provider.</p>
+
+  <div class="card">
+    <strong>Boundary rule:</strong><br>
+    Parse and validate once at the edge. Pass meaningful domain values inward.
+  </div>
+
+  <h2>What belongs where?</h2>
+  <ul>
+    <li><strong>Source adapter:</strong> open CSV, check headers, parse salary, parse game information, and translate status.</li>
+    <li><strong>Domain:</strong> represent `Player`, `Matchup`, and `SlateEntry`; enforce invariants such as a non-negative salary.</li>
+    <li><strong>Use case:</strong> select quarterbacks who are available and sort them by salary.</li>
+  </ul>
+  <p>A useful test is this: if DraftKings renamed <code>Game Info</code> to <code>Matchup</code>, how many layers should change? Ideally, one adapter and its tests.</p>
+
+  <h2>Your exercise</h2>
+  <p>Sketch the adapter’s public boundary in plain language or pseudocode. Include:</p>
+  <ol>
+    <li>what it accepts;</li>
+    <li>what it returns for valid rows;</li>
+    <li>how it reports rejected rows; and</li>
+    <li>which DraftKings details must not leak beyond the boundary.</li>
+  </ol>
+  <p>Then inspect the existing prototype and identify one detail that currently leaks source concerns into the domain model.</p>
+
+  <h2>Primary source</h2>
+  <p>Read the <a href="https://docs.python.org/3/library/csv.html">Python CSV module documentation</a> just far enough to notice that reading rows is separate from deciding what those rows mean. That separation is the architectural seam.</p>
+
+  <h2>Done when</h2>
+  <p>You can describe the adapter without mentioning sorting or QB selection, and you can explain why a rejected row is different from a failed import.</p>
+  <p class="small">Reply with your boundary sketch and the leaking detail. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../reference/input-contract.html">Input contract quick reference</a> · <a href="../lessons/0002-define-input-contract.html">Lesson 2</a></p>
+</main>
+</body>
+</html>
