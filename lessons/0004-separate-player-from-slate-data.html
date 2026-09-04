@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 4: Separate player from slate data</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 4 · DFS analytics architecture</p>
+  <h1>Separate player from slate data</h1>
+  <p class="dek">Give each concept the facts that remain true when the slate changes.</p>
+
+  <h2>The idea</h2>
+  <p>A <code>Player</code> identifies a person in the domain. A slate-specific record describes that player’s participation in one contest context. Keeping those apart prevents facts that change per slate from being mistaken for permanent player attributes.</p>
+
+  <div class="card">
+    <strong>Modeling test:</strong><br>
+    If the same player appears on tomorrow’s slate, which values can change without the person changing?
+  </div>
+
+  <h2>Start with facts</h2>
+  <ul>
+    <li><strong>Player:</strong> name and stable identity.</li>
+    <li><strong>Slate-specific concept:</strong> salary, matchup, availability, team, and eligible position.</li>
+  </ul>
+  <p>The second concept might be called <code>SlatePlayer</code>, <code>PlayerPoolEntry</code>, or something else. The name is not the decision yet. It should make the application’s language clearer to the people using and maintaining it.</p>
+
+  <h2>Your exercise</h2>
+  <ol>
+    <li>Choose two candidate names for the slate-specific concept.</li>
+    <li>For each name, write one sentence describing what an instance represents.</li>
+    <li>Decide where salary, matchup, and availability belong, and explain why.</li>
+    <li>Describe one future requirement that would make your chosen name feel wrong.</li>
+  </ol>
+  <p>You do not need to write code. Make the model precise enough that the adapter could create it from a raw row.</p>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/bliki/DomainDrivenDesign.html">Martin Fowler’s overview of Domain-Driven Design</a> with one question in mind: which names would make the DFS problem easier to discuss?</p>
+
+  <h2>Done when</h2>
+  <p>You can explain why a player and a player’s slate participation are different concepts, and defend a name for the slate-specific concept using the first-slice use cases.</p>
+  <p class="small">Reply with your candidate names and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../reference/domain-modeling.html">Domain modeling quick reference</a> · <a href="../lessons/0003-design-the-source-adapter.html">Lesson 3</a></p>
+</main>
+</body>
+</html>
