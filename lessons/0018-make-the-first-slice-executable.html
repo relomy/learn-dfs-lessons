@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 18: Make the first slice executable</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 18 · DFS analytics architecture</p>
+  <h1>Make the first slice executable</h1>
+  <p class="dek">Run one quarterback through assembly, evaluation, routing, and presentation.</p>
+
+  <h2>The language decision</h2>
+  <p>We are using TypeScript. It is new enough to make the implementation educational, but its discriminated unions fit the Ready, NeedsReview, and Rejected model you already designed. The compiler can narrow each branch by its <code>kind</code> field.</p>
+  <p>The language is not a second curriculum. For this slice, you need only object types, unions, functions, imports, and <code>switch</code>.</p>
+
+  <div class="card">
+    <strong>Implementation rule:</strong><br>
+    Keep the first slice small enough that every file has one reason to change.
+  </div>
+
+  <h2>Run it before reading it</h2>
+  <p>From the repository root, run:</p>
+  <pre><code>npm test
+npm start</code></pre>
+  <p>You should see four passing tests followed by:</p>
+  <pre><code>Example Quarterback: 8.00 passing yards per attempt</code></pre>
+
+  <h2>Trace the running path</h2>
+  <ol>
+    <li><a href="../src/main.ts"><code>main.ts</code></a> supplies one in-memory normalized input.</li>
+    <li><a href="../src/application.ts"><code>application.ts</code></a> asks assembly for an outcome and routes it.</li>
+    <li><a href="../src/assembly.ts"><code>assembly.ts</code></a> returns Ready, NeedsReview, or Rejected.</li>
+    <li><a href="../src/evaluation.ts"><code>evaluation.ts</code></a> owns the yards-per-attempt policy and NotEvaluable decision.</li>
+    <li><a href="../src/presentation.ts"><code>presentation.ts</code></a> turns the application result into console text.</li>
+  </ol>
+
+  <h2>See the type doing architectural work</h2>
+  <p>Open <a href="../src/domain.ts"><code>domain.ts</code></a> and find <code>AssemblyResult</code>. Each variant carries different data. The candidate also stores salary as integer cents, preserving the money decision from Lesson 5. In <code>application.ts</code>, the <code>switch</code> checks <code>assembly.kind</code>. Inside each branch, TypeScript exposes only the fields valid for that outcome. This is the code version of Lessons 15 through 17.</p>
+
+  <h2>Your experiment</h2>
+  <p>Before editing, predict what should happen if passing attempts become unknown. Then change this line in <code>main.ts</code>:</p>
+  <pre><code>passingAttempts: { kind: "known", value: 35 },</code></pre>
+  <p>to:</p>
+  <pre><code>passingAttempts: { kind: "unknown" },</code></pre>
+  <p>Run <code>npm start</code> again. Assembly should still return Ready because the candidate is valid. Evaluation should return NotEvaluable because this policy needs passing attempts. The presenter should print that result. Restore the original line when you finish.</p>
+
+  <h2>The automated feedback</h2>
+  <p><a href="../test/application.test.ts"><code>application.test.ts</code></a> exercises all three assembly paths. A fourth test proves that Ready may still become NotEvaluable inside the policy. Run <code>npm test</code> after every experiment.</p>
+
+  <h2>Primary source</h2>
+  <p>Read the official TypeScript section on <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions">discriminated unions</a>. Stop after you understand why checking <code>kind</code> changes which fields the compiler allows. The rest can wait.</p>
+
+  <h2>Done when</h2>
+  <p>You can run the slice, trace one input through all five files, explain why unknown attempts produce NotEvaluable rather than Rejected, and show that changing presentation text does not require changing assembly or evaluation.</p>
+  <p class="small">Reply with the output from your unknown-attempts experiment and the part of the TypeScript syntax that felt least obvious. Ask me about any compiler error rather than working around it.</p>
+  <p><a href="0017-route-assembly-outcomes.html">Lesson 17</a> · <a href="../reference/typescript-first-slice.html">TypeScript first-slice quick reference</a> · <a href="../reference/use-case-routing.html">Use-case routing</a></p>
+</main>
+</body>
+</html>

@@ -9,3 +9,6 @@ Thumbs.db
 
 # Local JavaScript dependencies
 node_modules/
+
+# Compiled TypeScript output
+dist/

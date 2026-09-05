@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Use-case routing: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Use-case routing</h1>
+  <p class="dek">The use case reads an application result and sends it to the next collaborator.</p>
+
+  <div class="card">
+    <strong>Coordination rule:</strong><br>
+    The use case chooses the next operation. The called component owns how that operation works.
+  </div>
+
+  <h2>Route each assembly outcome</h2>
+  <pre><code>Ready        → evaluation policy
+NeedsReview  → review queue
+Rejected     → diagnostics sink</code></pre>
+
+  <h2>Keep these responsibilities separate</h2>
+  <ul>
+    <li><strong>Route:</strong> the use case calls the appropriate port or policy.</li>
+    <li><strong>Score:</strong> the evaluation policy applies quarterback scoring rules.</li>
+    <li><strong>Shape:</strong> the presenter turns an application result into CLI, API, or UI output.</li>
+  </ul>
+
+  <h2>The test</h2>
+  <p>If replacing the UI changes the use case, presentation has leaked inward. If changing the quarterback formula changes the routing branches, scoring has leaked outward.</p>
+  <p><a href="../lessons/0017-route-assembly-outcomes.html">Lesson 17</a> · <a href="assembly-outcomes.html">Assembly outcomes</a> · <a href="candidate-assembly.html">Candidate assembly</a></p>
+</main>
+</body>
+</html>

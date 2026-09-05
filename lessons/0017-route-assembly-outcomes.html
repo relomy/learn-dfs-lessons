@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 17: Route assembly outcomes</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 17 · DFS analytics architecture</p>
+  <h1>Route assembly outcomes</h1>
+  <p class="dek">Let the use case choose what happens next without taking over scoring or presentation.</p>
+
+  <h2>The use case is the traffic controller</h2>
+  <p>Candidate assembly now returns Ready, NeedsReview, or Rejected. The use case reads that result and calls the appropriate collaborator. It coordinates the work. It does not perform every part of the work itself.</p>
+
+  <pre><code>Ready        → evaluator.evaluate(candidate)
+NeedsReview  → reviewQueue.add(reason, evidence)
+Rejected     → diagnostics.record(reason, source)</code></pre>
+
+  <div class="card">
+    <strong>Coordination rule:</strong><br>
+    The use case chooses the next operation. The called component owns how that operation works.
+  </div>
+
+  <h2>Follow one Ready result</h2>
+  <p>The use case receives <code>Ready(candidate)</code> and calls the evaluation policy. The policy may return a score or NotEvaluable. The use case then returns that application result to a presenter. The presenter decides whether the outside world sees a table row, JSON, or a CLI message.</p>
+
+  <div class="pipeline" aria-label="Ready outcome flow">
+    <div class="pipeline-step">Use case routes Ready</div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">Policy scores</div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">Presenter shapes output</div>
+  </div>
+
+  <h2>Practice the boundary</h2>
+  <p>Classify each proposed responsibility. Choose Route when the use case coordinates collaborators, Score when the evaluation policy owns the decision, and Shape when a presenter owns the external form. There are twelve cases before the set repeats.</p>
+  <div class="case-runner" id="routing-runner"></div>
+
+  <h2>Transfer check</h2>
+  <p>The evaluator returns NotEvaluable because passing attempts are unknown. Describe what the use case should do next. Then name one thing it must leave to the presenter.</p>
+
+  <h2>Primary source</h2>
+  <p>Read Alistair Cockburn's original <a href="https://alistair.cockburn.us/hexagonal-architecture/">Hexagonal Architecture</a> article. Focus on the claim that the application should run without intimate knowledge of its input and output technologies. Our use case can coordinate the same behavior whether the result eventually reaches a CLI, API, or test.</p>
+
+  <h2>Done when</h2>
+  <p>You can trace all three assembly outcomes, identify the next collaborator, and keep scoring rules and output formatting out of the use case.</p>
+
+  <div class="card">
+    <strong>Next:</strong><br>
+    Lesson 18 chooses a language and builds the first executable vertical slice from these decisions.
+  </div>
+
+  <p class="small">Ask follow-up questions if a responsibility could plausibly sit in two places. Explain what would change and what should remain stable.</p>
+  <p><a href="0016-model-assembly-outcomes.html">Lesson 16</a> · <a href="0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="../reference/use-case-routing.html">Use-case routing quick reference</a> · <a href="../reference/assembly-outcomes.html">Assembly outcomes</a></p>
+</main>
+<script src="../assets/case-runner.js"></script>
+<script>
+  CaseRunner.make(document.getElementById('routing-runner'), [
+    {
+      prompt: 'Who owns calling the evaluator after assembly returns Ready?',
+      records: [
+        { title: 'Proposed action', data: 'evaluator.evaluate(candidate)', state: 'Chooses the next collaborator' },
+        { title: 'Must remain stable', data: 'same call for CLI, API, or test', state: 'No output technology involved' }
+      ],
+      answer: 'pass',
+      hint: 'This chooses what happens next. It does not calculate the score.',
+      explanation: 'Route. The use case reads Ready and passes the candidate to the evaluator.',
+      short: 'Route. The use case calls the evaluator.'
+    },
+    {
+      prompt: 'Who owns multiplying passing touchdowns by the configured weight?',
+      records: [
+        { title: 'Proposed action', data: 'touchdowns × touchdown_weight', state: 'Applies a quarterback evaluation rule' },
+        { title: 'Reason to change', data: 'the scoring formula changes', state: 'Routing and output remain the same' }
+      ],
+      answer: 'hold',
+      hint: 'This operation determines the candidate score.',
+      explanation: 'Score. The evaluation policy owns the formula and its weights.',
+      short: 'Score. The policy owns the formula.'
+    },
+    {
+      prompt: 'Who owns rendering an evaluated quarterback as a JSON response?',
+      records: [
+        { title: 'Proposed action', data: 'score → { "rating": 82 }', state: 'Chooses an external representation' },
+        { title: 'Reason to change', data: 'the API contract changes', state: 'Domain scoring remains the same' }
+      ],
+      answer: 'drop',
+      hint: 'JSON is an output format, not an application rule.',
+      explanation: 'Shape. A presenter maps the application result into JSON.',
+      short: 'Shape. The presenter owns JSON.'
+    },
+    {
+      prompt: 'Who owns sending NeedsReview to the review queue?',
+      records: [
+        { title: 'Proposed action', data: 'reviewQueue.add(reason, evidence)', state: 'Routes an explicit application result' },
+        { title: 'Must not do', data: 'guess the player identity', state: 'A later review resolves the uncertainty' }
+      ],
+      answer: 'pass',
+      hint: 'The use case chooses the review path but does not perform the review.',
+      explanation: 'Route. The use case calls the review-queue port with the reason and evidence.',
+      short: 'Route. The use case chooses the review path.'
+    },
+    {
+      prompt: 'Who owns deciding that unknown passing attempts make this policy return NotEvaluable?',
+      records: [
+        { title: 'Proposed action', data: 'attempts: unknown → NotEvaluable', state: 'Defines data required by one scoring rule' },
+        { title: 'Reason to change', data: 'the evaluation policy changes', state: 'Candidate assembly stays valid' }
+      ],
+      answer: 'hold',
+      hint: 'This decides whether the scoring rule can run.',
+      explanation: 'Score. The evaluation policy owns its prerequisites and NotEvaluable result.',
+      short: 'Score. The policy owns scoring prerequisites.'
+    },
+    {
+      prompt: 'Who owns displaying NotEvaluable as "Insufficient data" in the UI?',
+      records: [
+        { title: 'Proposed action', data: 'NotEvaluable → Insufficient data', state: 'Chooses user-facing wording' },
+        { title: 'Reason to change', data: 'the product wording changes', state: 'The application result stays the same' }
+      ],
+      answer: 'drop',
+      hint: 'User-facing wording belongs at the output boundary.',
+      explanation: 'Shape. The presenter chooses how NotEvaluable appears to the user.',
+      short: 'Shape. The presenter owns the wording.'
+    },
+    {
+      prompt: 'Who owns sending Rejected to the diagnostic sink?',
+      records: [
+        { title: 'Proposed action', data: 'diagnostics.record(reason, source)', state: 'Routes failure context to a port' },
+        { title: 'Must not do', data: 'construct a partial candidate', state: 'Assembly already rejected it' }
+      ],
+      answer: 'pass',
+      hint: 'This selects a collaborator for an explicit result.',
+      explanation: 'Route. The use case forwards the rejection context to diagnostics.',
+      short: 'Route. The use case forwards the rejection.'
+    },
+    {
+      prompt: 'Who owns choosing HTTP status 422 for a rejected API request?',
+      records: [
+        { title: 'Proposed action', data: 'Rejected → HTTP 422', state: 'Maps an application result to HTTP' },
+        { title: 'Reason to change', data: 'the HTTP API contract changes', state: 'The use case still returns Rejected' }
+      ],
+      answer: 'drop',
+      hint: 'HTTP has no place in the application use case.',
+      explanation: 'Shape. The API presenter maps Rejected to an HTTP status.',
+      short: 'Shape. The presenter owns HTTP mapping.'
+    },
+    {
+      prompt: 'Who owns comparing quarterback efficiency against a scoring threshold?',
+      records: [
+        { title: 'Proposed action', data: 'yards_per_attempt ≥ threshold', state: 'Applies an evaluation rule' },
+        { title: 'Reason to change', data: 'the quarterback model changes', state: 'Routing remains the same' }
+      ],
+      answer: 'hold',
+      hint: 'This calculation changes the evaluation result.',
+      explanation: 'Score. The evaluation policy owns the threshold and comparison.',
+      short: 'Score. The policy owns the threshold.'
+    },
+    {
+      prompt: 'Who owns returning the evaluator result to the output boundary?',
+      records: [
+        { title: 'Proposed action', data: 'return evaluationResult', state: 'Completes application coordination' },
+        { title: 'Must not do', data: 'format a table row', state: 'The presenter acts after the use case' }
+      ],
+      answer: 'pass',
+      hint: 'The use case returns an application result without deciding its external form.',
+      explanation: 'Route. Returning the result completes the use case coordination work.',
+      short: 'Route. The use case returns the application result.'
+    },
+    {
+      prompt: 'Who owns sorting diagnostic fields into columns for a support dashboard?',
+      records: [
+        { title: 'Proposed action', data: 'reason, source, slate → table columns', state: 'Arranges data for one interface' },
+        { title: 'Reason to change', data: 'the dashboard layout changes', state: 'Routing remains the same' }
+      ],
+      answer: 'drop',
+      hint: 'A table layout is an output concern.',
+      explanation: 'Shape. A presenter prepares diagnostic data for the dashboard.',
+      short: 'Shape. The presenter owns the table layout.'
+    },
+    {
+      prompt: 'Who owns combining passing yards and interceptions into one rating?',
+      records: [
+        { title: 'Proposed action', data: 'yards_weighted − interception_penalty', state: 'Calculates domain evaluation value' },
+        { title: 'Reason to change', data: 'the scoring model changes', state: 'The use-case branches do not' }
+      ],
+      answer: 'hold',
+      hint: 'This is the substance of evaluation, not the path to evaluation.',
+      explanation: 'Score. The evaluation policy combines the features into a rating.',
+      short: 'Score. The policy owns the rating calculation.'
+    }
+  ], 'Use-case boundary trainer', { pass: 'Route', hold: 'Score', drop: 'Shape' }, 'Try again. Ask whether the line coordinates work, calculates a score, or chooses an output form.');
+</script>
+</body>
+</html>

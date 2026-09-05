@@ -1,6 +1,6 @@
 /* Reusable guided-to-blind decision practice for architecture lessons. */
 (function () {
-  function makeRunner(element, cases, title, labels) {
+  function makeRunner(element, cases, title, labels, blindHint) {
     var position = 0;
     var streak = 0;
     var blind = false;
@@ -43,7 +43,7 @@
         streak = 0;
         button.classList.add('bad');
         feedback.className = 'runner-feedback bad';
-        feedback.textContent = blind ? 'Try again. Decide whether the input can proceed, needs a person, or cannot form a valid candidate.' : item.hint;
+        feedback.textContent = blind ? (blindHint || 'Try again. Decide whether the input can proceed, needs a person, or cannot form a valid candidate.') : item.hint;
         offerNext('Try again');
       }
     }

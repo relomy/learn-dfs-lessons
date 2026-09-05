@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TypeScript first slice: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>TypeScript first slice</h1>
+  <p class="dek">Commands, files, and type patterns for the first executable quarterback path.</p>
+
+  <h2>Commands</h2>
+  <pre><code>npm test          # compile and run the three outcome paths
+npm start         # compile and run the in-memory example
+npm run typecheck # check types without emitting JavaScript</code></pre>
+
+  <h2>Path through the code</h2>
+  <pre><code>main.ts
+  → application.ts
+      → assembly.ts
+      → evaluation.ts
+  → presentation.ts</code></pre>
+
+  <h2>Discriminated union</h2>
+  <pre><code>type AssemblyResult =
+  | { kind: "ready"; candidate: QuarterbackCandidate }
+  | { kind: "needs-review"; reason: string }
+  | { kind: "rejected"; reason: string };</code></pre>
+  <p>Check <code>kind</code> before reading fields that belong to one variant. TypeScript then narrows the value to that variant.</p>
+
+  <h2>Change test</h2>
+  <ul>
+    <li>Scoring rule changes belong in <code>evaluation.ts</code>.</li>
+    <li>Routing changes belong in <code>application.ts</code>.</li>
+    <li>CLI wording changes belong in <code>presentation.ts</code>.</li>
+    <li>Provider parsing does not exist in this slice yet.</li>
+  </ul>
+
+  <p><a href="../lessons/0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="use-case-routing.html">Use-case routing</a> · <a href="assembly-outcomes.html">Assembly outcomes</a></p>
+</main>
+</body>
+</html>
