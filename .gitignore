@@ -12,3 +12,17 @@ node_modules/
 
 # Compiled TypeScript output
 dist/
+
+# TypeScript build metadata
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# npm error logs
+npm-debug.log*
