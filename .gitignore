@@ -1,0 +1,11 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor backups and swap files
+*~
+*.swp
+*.swo
+
+# Local JavaScript dependencies
+node_modules/
