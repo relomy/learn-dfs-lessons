@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 13: Match identities across sources</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 13 · DFS analytics architecture</p>
+  <h1>Match identities across sources</h1>
+  <p class="dek">Combine data without confusing provider IDs with player identity.</p>
+
+  <h2>The idea</h2>
+  <p>When salary, matchup, and statistics arrive from different sources, the system must decide which records refer to the same real-world player. A DraftKings ID identifies a record within DraftKings; it does not automatically identify the player across every provider.</p>
+
+  <div class="card">
+    <strong>Identity rule:</strong><br>
+    A source identifier is evidence about identity, not necessarily the domain identity itself.
+  </div>
+
+  <h2>Keep the identities distinct</h2>
+  <ul>
+    <li><strong>Canonical player identity:</strong> the application’s way of referring to the real player.</li>
+    <li><strong>Source identity:</strong> a provider’s identifier, such as a DraftKings ID or statistics-provider ID.</li>
+    <li><strong>Match decision:</strong> a deliberate link between source records and a canonical player.</li>
+  </ul>
+  <p>Name matching can be useful evidence, but names can vary by punctuation, suffix, spelling, or updates. An uncertain match should be represented as uncertain or left unmatched rather than silently joining the wrong player.</p>
+
+  <h2>Possible flow</h2>
+  <pre><code>DraftKings record ─┐
+                   ├─→ identity matching → canonical Player
+Stats record ──────┘
+
+source IDs remain attached as integration metadata</code></pre>
+
+  <h2>Transfer quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>What does a DraftKings ID primarily identify?</p>
+      <p>A. A provider record &nbsp; B. Every player everywhere &nbsp; C. A scoring rule</p>
+    </li>
+    <li>
+      <p>Why can’t names alone guarantee a match?</p>
+      <p>A. Names never change &nbsp; B. Names can vary &nbsp; C. Names are source IDs</p>
+    </li>
+    <li>
+      <p>Where should source IDs usually remain?</p>
+      <p>A. Integration metadata &nbsp; B. Ranking formula &nbsp; C. UI labels</p>
+    </li>
+    <li>
+      <p>What is safest for an ambiguous match?</p>
+      <p>A. Guess silently &nbsp; B. Mark uncertain &nbsp; C. Merge automatically</p>
+    </li>
+    <li>
+      <p>What enables combining salary and statistics?</p>
+      <p>A. Identity resolution &nbsp; B. Column copying &nbsp; C. Shared CSV syntax</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read <a href="https://martinfowler.com/eaaCatalog/identityField.html">Martin Fowler’s description of an Identity Field</a> with one question in mind: which identifier belongs to the system, and which belongs only to a persistence or external system?</p>
+
+  <h2>Done when</h2>
+  <p>You can distinguish canonical identity from source identity and explain why uncertain cross-source matches must not be silently accepted.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0012-define-the-evaluation-contract.html">Lesson 12</a> · <a href="../reference/domain-modeling.html">Domain modeling quick reference</a></p>
+</main>
+</body>
+</html>

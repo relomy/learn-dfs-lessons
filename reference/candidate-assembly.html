@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate assembly: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Candidate assembly</h1>
+  <p class="dek">Join normalized records into a domain candidate while keeping uncertainty and rejection visible.</p>
+  <div class="card">
+    <strong>Assembly rule:</strong><br>
+    The assembler decides whether records can form a candidate. The evaluation policy decides how an eligible candidate scores.
+  </div>
+  <h2>Inputs</h2>
+  <ul>
+    <li>records linked to the same player and slate;</li>
+    <li>domain-owned values from source adapters; and</li>
+    <li>the known state of each value, including unknown or invalid.</li>
+  </ul>
+  <h2>Outcomes</h2>
+  <ul>
+    <li><strong>Pass:</strong> create a candidate and preserve any uncertainty that the evaluation policy owns.</li>
+    <li><strong>Hold:</strong> stop for identity or other review that a person or later process may resolve.</li>
+    <li><strong>Drop:</strong> do not create a candidate because a required input is invalid or absent.</li>
+  </ul>
+  <h2>Do not collapse these</h2>
+  <p>An unresolved identity is not an invalid value. An unknown passing-attempt count is not zero. A candidate that reaches the evaluation policy is not necessarily scored. Each has a different owner and a different next action.</p>
+  <p><a href="../lessons/0015-assemble-evaluation-candidate.html">Lesson 15</a> · <a href="boundary-normalization.html">Boundary normalization</a> · <a href="input-contract.html">Input contracts</a></p>
+</main>
+</body>
+</html>

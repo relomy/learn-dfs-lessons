@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boundary normalization quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Boundary normalization</h1>
+  <p class="dek">Translate provider-shaped data into application-owned meaning before it reaches the evaluation core.</p>
+
+  <div class="card">
+    <strong>Boundary rule:</strong><br>
+    External formats may vary; domain meaning should remain stable.
+  </div>
+
+  <h2>Pipeline</h2>
+  <pre><code>raw source record → adapter → normalized domain input → evaluator</code></pre>
+
+  <h2>Normalize here</h2>
+  <ul>
+    <li>field names and nesting</li>
+    <li>types, units, and representations</li>
+    <li>identity references</li>
+    <li>missing, invalid, and unavailable values</li>
+  </ul>
+
+  <h2>Do not leak</h2>
+  <ul>
+    <li>provider DTOs or column names</li>
+    <li>provider-specific status codes</li>
+    <li>transport details</li>
+    <li>silent guesses about missing data</li>
+  </ul>
+
+  <h2>Useful distinction</h2>
+  <p><strong>Zero</strong> means the measured value is zero. <strong>Missing</strong> means the value is not available. They must not be normalized to the same thing.</p>
+  <p><a href="../lessons/0014-normalize-at-the-boundary.html">Lesson 14</a> · <a href="../reference/input-contract.html">Input contract</a> · <a href="../reference/domain-modeling.html">Domain modeling</a></p>
+</main>
+</body>
+</html>

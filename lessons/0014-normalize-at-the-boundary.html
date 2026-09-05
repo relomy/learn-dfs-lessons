@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 14: Normalize at the boundary</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 14 · DFS analytics architecture</p>
+  <h1>Normalize at the boundary</h1>
+  <p class="dek">Translate provider-shaped records into stable, domain-owned evaluation inputs.</p>
+
+  <h2>The idea</h2>
+  <p>Identity resolution tells us which records refer to the same player. Normalization tells us what those records mean in our application. Both should happen before data enters the evaluation core.</p>
+
+  <div class="card">
+    <strong>Boundary rule:</strong><br>
+    External formats may vary; domain meaning should remain stable.
+  </div>
+
+  <h2>Example</h2>
+  <pre><code>DraftKings: {"passYds": "280", "salary": "$7,400"}
+        ↓ adapter translation
+EvaluationInput: {passing_yards: 280, salary: 7400}</code></pre>
+  <p>The evaluator should not know that one source calls the field <code>passYds</code> or encodes salary with a dollar sign.</p>
+
+  <h2>Make uncertainty visible</h2>
+  <p>A missing statistic is not automatically zero. Zero means the measured value is zero; missing means the value is unavailable. The normalized input should preserve that distinction so the evaluation policy can decide whether the player is evaluable.</p>
+
+  <h2>Transfer quiz</h2>
+  <p>Reply with your choices in this format: <code>1A, 2B, 3C, 4A, 5B</code>. Explain the answer you found hardest.</p>
+  <ol>
+    <li>
+      <p>Where should provider field names be translated?</p>
+      <p>A. At the boundary &nbsp; B. In evaluation &nbsp; C. In presentation</p>
+    </li>
+    <li>
+      <p>What should happen to <code>"280"</code> passing yards?</p>
+      <p>A. Keep text &nbsp; B. Normalize numeric &nbsp; C. Drop field</p>
+    </li>
+    <li>
+      <p>What does missing passing data mean?</p>
+      <p>A. Zero yards &nbsp; B. Unknown value &nbsp; C. Best estimate</p>
+    </li>
+    <li>
+      <p>What should the evaluator receive?</p>
+      <p>A. Raw DTO &nbsp; B. CSV row &nbsp; C. Domain input</p>
+    </li>
+    <li>
+      <p>Why normalize before evaluation?</p>
+      <p>A. Hide meaning &nbsp; B. Stabilize meaning &nbsp; C. Copy columns</p>
+    </li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read Martin Fowler’s explanation of the <a href="https://martinfowler.com/articles/patterns-legacy-displacement/legacy-mimic.html">Anti-Corruption Layer</a>. Focus on the idea of translating an external model so it does not compromise your own domain model.</p>
+
+  <h2>Done when</h2>
+  <p>You can take a provider-shaped quarterback record and describe the domain-owned input it becomes, including how missing data is represented.</p>
+  <p class="small">Reply with your quiz choices and reasoning. Ask follow-up questions whenever a term or choice is unclear.</p>
+  <p><a href="../lessons/0013-match-identities-across-sources.html">Lesson 13</a> · <a href="../reference/boundary-normalization.html">Boundary normalization quick reference</a> · <a href="../reference/input-contract.html">Input contract</a></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 15: Assemble an evaluation candidate</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 15 · DFS analytics architecture</p>
+  <h1>Assemble an evaluation candidate</h1>
+  <p class="dek">Bring normalized records together without turning uncertainty into a silent guess.</p>
+
+  <h2>The idea</h2>
+  <p>Identity matching tells us which records refer to the same player. Boundary normalization gives those records stable meaning. Candidate assembly uses both results to decide whether the system can create one quarterback candidate for a slate.</p>
+  <div class="pipeline" aria-label="Candidate assembly pipeline">
+    <div class="pipeline-step">Normalized salary, stats, and matchup records</div>
+    <div class="pipeline-arrow">↓</div>
+    <div class="pipeline-step">Candidate assembler</div>
+    <div class="pipeline-arrow">↓</div>
+    <div class="pipeline-step">Candidate, review item, or explicit rejection</div>
+  </div>
+  <div class="card">
+    <strong>Boundary rule:</strong><br>
+    Assembly decides whether the records can form a candidate. Evaluation decides what a candidate is worth.
+  </div>
+
+  <h2>Three outcomes</h2>
+  <ul>
+    <li><strong>Pass:</strong> create the candidate and send it to the evaluation policy. Unknown values remain unknown when the policy owns that decision.</li>
+    <li><strong>Hold:</strong> preserve an unresolved identity for review. Never make a quiet cross-source guess.</li>
+    <li><strong>Drop:</strong> reject inputs that cannot form a valid candidate, such as an invalid required salary.</li>
+  </ul>
+
+  <h2>Practice the decision</h2>
+  <p>Choose the next action for each case. Start guided. When you can get five correct, switch to blind mode. The labels are intentionally short: you must retrieve the reason, not recognize it from the button text.</p>
+  <div class="case-runner" id="candidate-runner"></div>
+
+  <h2>Transfer check</h2>
+  <p>Suppose a quarterback has matching salary and matchup records, but no passing attempts. The normalized value remains unknown. Which component decides whether that makes the candidate unevaluable, and why is that decision not the assembler's?</p>
+
+  <h2>Primary source</h2>
+  <p>Read the <a href="https://github.com/datacontract/datacontract-specification">Data Contract Specification</a>, especially its treatment of data quality and contract expectations. Read it alongside Martin Fowler's <a href="https://martinfowler.com/articles/patterns-legacy-displacement/legacy-mimic.html">Anti-Corruption Layer</a>: external variation belongs at the boundary, while application rules stay owned by the application.</p>
+
+  <h2>Done when</h2>
+  <p>You can look at normalized source records and say whether to pass, hold, or drop them, then name the component that owns the next decision.</p>
+  <p class="small">Ask follow-up questions whenever a case feels ambiguous. Explain which case made you hesitate and why.</p>
+  <p><a href="0014-normalize-at-the-boundary.html">Lesson 14</a> · <a href="../reference/candidate-assembly.html">Candidate assembly quick reference</a> · <a href="../reference/boundary-normalization.html">Boundary normalization</a></p>
+</main>
+<script src="../assets/case-runner.js"></script>
+<script>
+  CaseRunner.make(document.getElementById('candidate-runner'), [
+    {
+      prompt: 'Jordan Love is matched to one NFL slate. What should the assembler do?',
+      records: [
+        { title: 'Salary', data: 'player: Jordan Love\nsalary: 7400', state: 'Normalized and linked' },
+        { title: 'Stats', data: 'pass yards: 280\nattempts: unknown', state: 'Normalized and linked' },
+        { title: 'Matchup', data: 'opponent: DET', state: 'Normalized and linked' }
+      ],
+      answer: 'pass',
+      hint: 'Unknown passing attempts is not an identity problem or an invalid value. Preserve it for the evaluation policy.',
+      explanation: 'Pass. The records form one candidate. Keep attempts unknown so the evaluation policy can decide whether it is evaluable.',
+      short: 'Pass. The policy owns the effect of an unknown statistic.'
+    },
+    {
+      prompt: 'Two source records may describe the same player, but the name match is ambiguous. What should the assembler do?',
+      records: [
+        { title: 'Salary', data: 'name: J. Williams\nsalary: 6100', state: 'Provider identity: DK-44' },
+        { title: 'Stats', data: 'name: Jayden Williams\npass yards: 241', state: 'Provider identity: ST-91' },
+        { title: 'Match result', data: 'confidence: ambiguous', state: 'No canonical player link' }
+      ],
+      answer: 'hold',
+      hint: 'The issue is which player the records describe. Do not turn a doubtful match into a candidate.',
+      explanation: 'Hold. Identity resolution has not produced a trustworthy link, so this needs review rather than a silent merge.',
+      short: 'Hold. An ambiguous identity needs review.'
+    },
+    {
+      prompt: 'A normalized salary is negative because the source value was malformed. What should the assembler do?',
+      records: [
+        { title: 'Salary', data: 'player: C. Stroud\nsalary: -7400', state: 'Required value is invalid' },
+        { title: 'Stats', data: 'pass yards: 279', state: 'Normalized and linked' },
+        { title: 'Matchup', data: 'opponent: IND', state: 'Normalized and linked' }
+      ],
+      answer: 'drop',
+      hint: 'There is no candidate with a valid required salary. Preserve the rejection reason for diagnostics.',
+      explanation: 'Drop. The records cannot form a valid candidate. The adapter or intake process should report the malformed source value.',
+      short: 'Drop. An invalid required value cannot form a candidate.'
+    },
+    {
+      prompt: 'All required records are linked and valid. A weather forecast has not arrived. What should the assembler do?',
+      records: [
+        { title: 'Salary', data: 'player: B. Nix\nsalary: 5800', state: 'Normalized and linked' },
+        { title: 'Stats', data: 'pass yards: 225\nattempts: 31', state: 'Normalized and linked' },
+        { title: 'Weather', data: 'forecast: unknown', state: 'Optional enrichment' }
+      ],
+      answer: 'pass',
+      hint: 'Optional enrichment is not a required evaluation input in this contract.',
+      explanation: 'Pass. The candidate has all required inputs. Optional enrichment may remain absent without blocking assembly.',
+      short: 'Pass. Optional data does not block this contract.'
+    },
+    {
+      prompt: 'The player is matched, but there is no salary record for this slate. What should the assembler do?',
+      records: [
+        { title: 'Salary', data: 'no record for slate', state: 'Required input absent' },
+        { title: 'Stats', data: 'pass yards: 301\nattempts: 37', state: 'Normalized and linked' },
+        { title: 'Matchup', data: 'opponent: BUF', state: 'Normalized and linked' }
+      ],
+      answer: 'drop',
+      hint: 'A DFS slate candidate needs a slate salary. This is not an unresolved identity.',
+      explanation: 'Drop. Salary is required to create a slate candidate in this contract, so there is nothing to evaluate for this slate.',
+      short: 'Drop. This slate candidate has no required salary.'
+    }
+  ]);
+</script>
+</body>
+</html>

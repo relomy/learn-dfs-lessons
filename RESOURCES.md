@@ -6,6 +6,8 @@
   Use for the basic structure, quoting, headers, and record conventions of CSV input.
 - [Data Contract Specification](https://github.com/datacontract/datacontract-specification)
   Use for thinking about data shape, meaning, quality expectations, and terms of exchange between a provider and a consumer.
+- [Anti-Corruption Layer](https://martinfowler.com/articles/patterns-legacy-displacement/legacy-mimic.html)
+  Use for translating an external model at an integration boundary so it does not compromise the application’s domain model.
 
 ## Wisdom
 

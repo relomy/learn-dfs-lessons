@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 16: Model assembly outcomes</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 16 · DFS analytics architecture</p>
+  <h1>Model assembly outcomes</h1>
+  <p class="dek">Make the next action clear when records form a candidate, need review, or cannot form one.</p>
+
+  <h2>The problem with a simple failure signal</h2>
+  <p>Suppose candidate assembly returns <code>false</code> or <code>null</code>. The caller knows no candidate came back, but not whether it should ask for a review, show a data-quality error, retry later, or simply stop. Those outcomes lead to different actions.</p>
+
+  <div class="card">
+    <strong>Result rule:</strong><br>
+    Return the next action, plus only the context that action needs.
+  </div>
+
+  <h2>Three explicit results</h2>
+  <div class="pipeline" aria-label="Assembly result variants">
+    <div class="pipeline-step"><strong>Ready (Pass)</strong><br>A domain candidate</div>
+    <div class="pipeline-step"><strong>Needs review (Hold)</strong><br>Reason and source references</div>
+    <div class="pipeline-step"><strong>Rejected (Drop)</strong><br>Reason and invalid input context</div>
+  </div>
+  <p>These are not three error messages. <strong>Ready</strong> continues to evaluation. <strong>Needs review</strong> waits for a decision that may change later. <strong>Rejected</strong> records why this input cannot create a candidate under the current contract.</p>
+
+  <h2>What belongs in each result?</h2>
+  <ul>
+    <li><strong>Ready:</strong> the candidate, including any intentionally unknown evaluation inputs.</li>
+    <li><strong>Needs review:</strong> a reason code and the source record references needed to resolve the match.</li>
+    <li><strong>Rejected:</strong> a reason code and the offending source reference. Do not attach a half-valid candidate.</li>
+  </ul>
+
+  <h2>Practice the result shape</h2>
+  <p>For each case, choose the result that lets the next component act safely. The cards name the information the result must carry. In guided mode, read the reason after each answer. Then try blind mode and aim for five correct.</p>
+  <div class="case-runner" id="outcome-runner"></div>
+
+  <h2>Transfer check</h2>
+  <p>A caller receives <code>NeedsReview</code> for an ambiguous name match. What information must it receive besides the word “ambiguous,” and why would <code>null</code> be a poor replacement?</p>
+
+  <h2>Primary source</h2>
+  <p>Read the <a href="https://github.com/datacontract/datacontract-specification">Data Contract Specification</a> with this question in mind: what must a consumer know when a contract cannot be satisfied? The same concern applies inside an application. The result must preserve the information the next step needs.</p>
+
+  <h2>Done when</h2>
+  <p>You can choose Ready, Needs review, or Rejected and name the minimum information each result carries.</p>
+  <p class="small">Ask follow-up questions whenever two outcomes seem close. Explain the next action that separates them.</p>
+  <p><a href="0015-assemble-evaluation-candidate.html">Lesson 15</a> · <a href="../reference/assembly-outcomes.html">Assembly outcomes quick reference</a> · <a href="../reference/candidate-assembly.html">Candidate assembly</a></p>
+</main>
+<script src="../assets/case-runner.js"></script>
+<script>
+  CaseRunner.make(document.getElementById('outcome-runner'), [
+    {
+      prompt: 'Which result should carry this candidate to the evaluator?',
+      records: [
+        { title: 'Assembly fact', data: 'player and slate resolved\nsalary: 7400\nattempts: unknown', state: 'All candidate invariants hold' },
+        { title: 'Result must carry', data: 'QuarterbackCandidate\nattempts: unknown', state: 'The policy needs the honest value' }
+      ],
+      answer: 'pass',
+      hint: 'The evaluator needs a candidate, not a review item or an error.',
+      explanation: 'Ready. Return the candidate and preserve attempts as unknown for the evaluation policy.',
+      short: 'Ready. Return the candidate.'
+    },
+    {
+      prompt: 'Which result should let a reviewer resolve this identity conflict?',
+      records: [
+        { title: 'Assembly fact', data: 'DK-44: J. Williams\nST-91: Jayden Williams', state: 'No safe canonical link' },
+        { title: 'Result must carry', data: 'reason: ambiguous_identity\nsource refs: DK-44, ST-91', state: 'A reviewer needs the evidence' }
+      ],
+      answer: 'hold',
+      hint: 'A later decision may resolve this. Preserve the evidence that lets someone make it.',
+      explanation: 'Needs review. Return a reason and the relevant source references, not a candidate or an unexplained null.',
+      short: 'Needs review. Return the reason and source references.'
+    },
+    {
+      prompt: 'Which result should record this contract violation without exposing a half-candidate?',
+      records: [
+        { title: 'Assembly fact', data: 'salary: -7400', state: 'Required salary must be positive' },
+        { title: 'Result must carry', data: 'reason: invalid_salary\nsource ref: DK-44', state: 'Diagnostics need the source' }
+      ],
+      answer: 'drop',
+      hint: 'No later identity decision can repair a broken required invariant in this input.',
+      explanation: 'Rejected. Return the reason and source reference, without a partial candidate that could be evaluated accidentally.',
+      short: 'Rejected. Return the diagnostic reason and reference.'
+    },
+    {
+      prompt: 'Which result should feed a review queue for duplicate salary rows?',
+      records: [
+        { title: 'Assembly fact', data: 'DK-44 salary: 6100\nDK-45 salary: 6700', state: 'Same player and slate, conflicting values' },
+        { title: 'Result must carry', data: 'reason: conflicting_salary\nboth row references\nslate reference', state: 'A reviewer must compare the rows' }
+      ],
+      answer: 'hold',
+      hint: 'The caller needs evidence to resolve an uncertainty, not only notice that no candidate exists.',
+      explanation: 'Needs review. The result carries the ambiguity reason and enough source context for the review queue.',
+      short: 'Needs review. Keep the evidence for resolution.'
+    },
+    {
+      prompt: 'Which result is correct when optional weather data is absent?',
+      records: [
+        { title: 'Assembly fact', data: 'required fields valid\nweather: unknown', state: 'Weather is optional enrichment' },
+        { title: 'Result must carry', data: 'QuarterbackCandidate\nweather: unknown', state: 'No need for a review item' }
+      ],
+      answer: 'pass',
+      hint: 'This does not rewrite the earlier assembly outcome. The policy makes its own result after receiving a candidate.',
+      explanation: 'Ready. Assembly correctly returned the candidate. The evaluator may separately return not evaluable.',
+      short: 'Ready. Optional enrichment may remain unknown.'
+    },
+    {
+      prompt: 'Which result should describe a player whose valid salary belongs to a different slate than the requested one?',
+      records: [
+        { title: 'Assembly fact', data: 'requested slate: WK-5\nsalary slate: WK-4', state: 'Required slate relationship is wrong' },
+        { title: 'Result must carry', data: 'reason: salary_wrong_slate\nsource ref: DK-44', state: 'The input cannot form this slate candidate' }
+      ],
+      answer: 'drop',
+      hint: 'The record is valid in isolation but cannot create the requested slate candidate.',
+      explanation: 'Rejected. Return the wrong-slate reason and source reference. Do not reuse a salary from another slate.',
+      short: 'Rejected. A valid value can still belong to the wrong slate.'
+    },
+    {
+      prompt: 'Which result should capture a source record that lacks the salary column entirely?',
+      records: [
+        { title: 'Assembly fact', data: 'provider: DraftKings\nrequired field: salary\nreceived: absent', state: 'The contract cannot be satisfied' },
+        { title: 'Result must carry', data: 'reason: missing_salary\nsource file reference', state: 'Intake diagnostics need a trace' }
+      ],
+      answer: 'drop',
+      hint: 'There is no candidate to evaluate, and a person cannot resolve a field that was never supplied.',
+      explanation: 'Rejected. The result records the missing field and source file for the intake or adapter owner.',
+      short: 'Rejected. Preserve the missing-field diagnostic.'
+    },
+    {
+      prompt: 'Which result should capture two equally plausible canonical players for a provider ID?',
+      records: [
+        { title: 'Assembly fact', data: 'provider ID: ST-91\ncandidates: P-201, P-344', state: 'Identity mapping is unresolved' },
+        { title: 'Result must carry', data: 'reason: multiple_identity_matches\nprovider ID\ncandidate IDs', state: 'A later mapping can resolve it' }
+      ],
+      answer: 'hold',
+      hint: 'The input is not malformed. The system needs a future identity decision.',
+      explanation: 'Needs review. Include the provider ID and both candidate identities so the ambiguity can be resolved.',
+      short: 'Needs review. Keep the competing identities.'
+    },
+    {
+      prompt: 'Which result should return a candidate when the stats source has no passing-yard value yet?',
+      records: [
+        { title: 'Assembly fact', data: 'player and slate resolved\nsalary: 6900\npassing yards: unknown', state: 'Unknown is preserved, not replaced with zero' },
+        { title: 'Result must carry', data: 'QuarterbackCandidate\npassing yards: unknown', state: 'Evaluation policy owns scoring eligibility' }
+      ],
+      answer: 'pass',
+      hint: 'The explicit unknown goes to the policy. It is neither an identity review nor a malformed candidate invariant.',
+      explanation: 'Ready. The candidate carries an unknown passing-yard value to the evaluation policy.',
+      short: 'Ready. Preserve the unknown for evaluation.'
+    },
+    {
+      prompt: 'Which result should keep a valid candidate separate from a later evaluation decision?',
+      records: [
+        { title: 'Assembly fact', data: 'candidate invariants hold\nreceiver yards: unknown', state: 'Assembly succeeds' },
+        { title: 'Later policy fact', data: 'this policy requires receiver yards', state: 'Evaluator returns not evaluable later' }
+      ],
+      answer: 'pass',
+      hint: 'Do not move policy prerequisites backward into candidate assembly.',
+      explanation: 'Ready. Assembly returns its valid candidate; the evaluation policy independently decides it cannot score this one.',
+      short: 'Ready. Evaluation has a separate later result.'
+    }
+  ], 'Assembly outcome trainer', { pass: 'Ready', hold: 'Review', drop: 'Reject' });
+</script>
+</body>
+</html>

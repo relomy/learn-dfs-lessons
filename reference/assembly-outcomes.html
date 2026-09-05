@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assembly outcomes: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Assembly outcomes</h1>
+  <p class="dek">Represent the next action explicitly when candidate assembly succeeds, needs review, or rejects input.</p>
+  <div class="card">
+    <strong>Result rule:</strong><br>
+    A result must tell the next component what to do and include the information needed to do it.
+  </div>
+  <h2>Ready</h2>
+  <p>Contains the domain candidate. It may retain unknown values that the evaluation policy owns.</p>
+  <h2>Needs review</h2>
+  <p>Contains a machine-readable reason, the affected source references, and enough context for a person or later process to resolve the identity question.</p>
+  <h2>Rejected</h2>
+  <p>Contains a reason and source context for diagnostics. It does not contain a candidate that another component might accidentally evaluate.</p>
+  <h2>Avoid ambiguous signals</h2>
+  <p>A boolean cannot say why assembly failed. A null cannot distinguish reviewable uncertainty from a permanent rejection. An explicit result makes those paths visible to callers and tests.</p>
+  <p><a href="../lessons/0016-model-assembly-outcomes.html">Lesson 16</a> · <a href="candidate-assembly.html">Candidate assembly</a> · <a href="input-contract.html">Input contracts</a></p>
+</main>
+</body>
+</html>
