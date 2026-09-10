@@ -1,3 +1,7 @@
+export type TeamContextLookup =
+  | { readonly kind: "found"; readonly context: TeamGameContext }
+  | { readonly kind: "missing"; readonly team: string };
+
 export interface VegasGameLine {
   readonly awayTeam: string;
   readonly homeTeam: string;
@@ -32,4 +36,23 @@ export function deriveTeamContexts(
       impliedTeamTotal: homeImpliedTeamTotal,
     },
   ];
+}
+
+export function findTeamGameContext(
+  team: string,
+  contexts: readonly TeamGameContext[],
+): TeamContextLookup {
+  const context = contexts.find((context) => context.team === team);
+
+  if (context === undefined) {
+    return {
+      kind: "missing",
+      team: team,
+    };
+  }
+
+  return {
+    kind: "found",
+    context: context,
+  };
 }

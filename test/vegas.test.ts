@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { deriveTeamContexts } from "../src/vegas.js";
+import { deriveTeamContexts, findTeamGameContext } from "../src/vegas.js";
 
 test("A home favorite receives the larger implied total", () => {
   assert.deepEqual(
@@ -92,4 +92,37 @@ test("Implied team totals add up to the game total", () => {
     awayContext.impliedTeamTotal + homeContext.impliedTeamTotal,
     line.gameTotal,
   );
+});
+
+test("Finds a team's game context", () => {
+  const contexts = deriveTeamContexts({
+    awayTeam: "BUF",
+    homeTeam: "HOU",
+    gameTotal: 48,
+    homeSpread: -3,
+  });
+
+  assert.deepEqual(findTeamGameContext("HOU", contexts), {
+    kind: "found",
+    context: {
+      team: "HOU",
+      opponent: "BUF",
+      gameTotal: 48,
+      impliedTeamTotal: 25.5,
+    },
+  });
+});
+
+test("Reports a missing team context", () => {
+  const contexts = deriveTeamContexts({
+    awayTeam: "BUF",
+    homeTeam: "HOU",
+    gameTotal: 48,
+    homeSpread: -3,
+  });
+
+  assert.deepEqual(findTeamGameContext("DAL", contexts), {
+    kind: "missing",
+    team: "DAL",
+  });
 });
