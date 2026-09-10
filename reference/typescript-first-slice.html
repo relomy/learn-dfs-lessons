@@ -13,7 +13,7 @@
   <p class="dek">Commands, files, and type patterns for the first executable quarterback path.</p>
 
   <h2>Commands</h2>
-  <pre><code>npm test          # compile and run the three outcome paths
+  <pre><code>npm test          # compile and run the tests
 npm start         # compile and run the in-memory example
 npm run typecheck # check types without emitting JavaScript</code></pre>
 
@@ -31,6 +31,18 @@ npm run typecheck # check types without emitting JavaScript</code></pre>
   | { kind: "rejected"; reason: string };</code></pre>
   <p>Check <code>kind</code> before reading fields that belong to one variant. TypeScript then narrows the value to that variant.</p>
 
+  <h2>Syntax used in policy tests</h2>
+  <pre><code>const input: NormalizedQuarterbackInput = {
+  ...baseInput,
+  passingAttempts: { kind: "known", value: 7 },
+};</code></pre>
+  <ul>
+    <li><code>:</code> gives a variable or property its expected type.</li>
+    <li><code>...baseInput</code> copies properties into a new object.</li>
+    <li>A later property replaces a copied property with the same name.</li>
+    <li><code>"a" | "b"</code> permits exactly those two string values.</li>
+  </ul>
+
   <h2>Change test</h2>
   <ul>
     <li>Scoring rule changes belong in <code>evaluation.ts</code>.</li>
@@ -39,7 +51,7 @@ npm run typecheck # check types without emitting JavaScript</code></pre>
     <li>Provider parsing does not exist in this slice yet.</li>
   </ul>
 
-  <p><a href="../lessons/0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="use-case-routing.html">Use-case routing</a> · <a href="assembly-outcomes.html">Assembly outcomes</a></p>
+  <p><a href="../lessons/0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="../lessons/0019-change-an-evaluation-rule.html">Lesson 19</a> · <a href="use-case-routing.html">Use-case routing</a> · <a href="assembly-outcomes.html">Assembly outcomes</a></p>
 </main>
 </body>
 </html>

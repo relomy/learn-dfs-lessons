@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 19: Change an evaluation rule</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 19 · DFS analytics architecture</p>
+  <h1>Change an evaluation rule</h1>
+  <p class="dek">Use one failing test to add a minimum-attempts rule without changing assembly or routing.</p>
+
+  <h2>The new rule</h2>
+  <p>A quarterback with 1 through 9 known passing attempts has too little data for this evaluation policy. The candidate remains valid, but the policy returns <code>not-evaluable</code> with reason <code>insufficient-attempts</code>.</p>
+
+  <div class="card">
+    <strong>Prediction before code:</strong><br>
+    Which files should change? Write down your answer before reading the steps below.
+  </div>
+
+  <h2>Three pieces of TypeScript</h2>
+  <p>You only need three pieces of syntax for this change.</p>
+
+  <h3>A property type</h3>
+  <pre><code>const input: NormalizedQuarterbackInput = { ... };</code></pre>
+  <p>The text after <code>:</code> tells TypeScript what shape <code>input</code> must have. This is close to a Python variable annotation such as <code>input: NormalizedQuarterbackInput</code>.</p>
+
+  <h3>Object spread</h3>
+  <pre><code>const input = {
+  ...baseInput,
+  passingAttempts: { kind: "known", value: 7 },
+};</code></pre>
+  <p><code>...baseInput</code> copies the existing properties. The later <code>passingAttempts</code> property replaces the copied one. The Python dictionary equivalent is <code>{**base_input, "passingAttempts": ...}</code>.</p>
+
+  <h3>A union of exact strings</h3>
+  <pre><code>reason:
+  | "missing-passing-data"
+  | "no-passing-attempts"
+  | "insufficient-attempts";</code></pre>
+  <p>Each quoted value is both text and an allowed literal type. The <code>|</code> means "or." TypeScript will reject any other reason.</p>
+
+  <h2>Red: add one failing example</h2>
+  <p>Add this test to <a href="../test/application.test.ts"><code>test/application.test.ts</code></a>:</p>
+  <pre><code>test("Too few attempts are not evaluable", () =&gt; {
+  const recorder = dependencyRecorder();
+  const input: NormalizedQuarterbackInput = {
+    ...baseInput,
+    passingAttempts: { kind: "known", value: 7 },
+  };
+
+  const result = runQuarterbackEvaluation(input, recorder.dependencies);
+
+  assert.deepEqual(result, {
+    kind: "evaluation-complete",
+    evaluation: {
+      kind: "not-evaluable",
+      playerId: "player-1",
+      displayName: "Example Quarterback",
+      reason: "insufficient-attempts",
+    },
+  });
+});</code></pre>
+  <p>Run <code>npm test</code>. The failure should show that the policy returned <code>scored</code>. That failure is useful. It proves the test can detect the missing rule.</p>
+
+  <h2>Green: teach the type, then the policy</h2>
+  <p>First, open <a href="../src/domain.ts"><code>src/domain.ts</code></a>. Add <code>"insufficient-attempts"</code> to the allowed reasons for the <code>not-evaluable</code> variant of <code>EvaluationResult</code>.</p>
+  <p>Next, open <a href="../src/evaluation.ts"><code>src/evaluation.ts</code></a>. Keep the zero-attempt check as its own case. Immediately after it, add:</p>
+  <pre><code>if (candidate.passingAttempts.value &lt; 10) {
+  return {
+    kind: "not-evaluable",
+    playerId: candidate.playerId,
+    displayName: candidate.displayName,
+    reason: "insufficient-attempts",
+  };
+}</code></pre>
+  <p>Run:</p>
+  <pre><code>npm run typecheck
+npm test</code></pre>
+  <p>You should now have five passing tests.</p>
+
+  <h2>Check the boundary</h2>
+  <p>Run:</p>
+  <pre><code>git diff -- src/domain.ts src/evaluation.ts test/application.test.ts
+git diff -- src/assembly.ts src/application.ts</code></pre>
+  <p>The first command should show your type, policy, and test changes. The second should show nothing. Assembly still decides whether it can construct a candidate. The use case still routes the same outcomes. Only the evaluation contract and policy changed.</p>
+
+  <h2>Explain the result</h2>
+  <p>Answer these from memory:</p>
+  <ol>
+    <li>Why is a candidate with seven attempts valid but not evaluable?</li>
+    <li>Why did <code>domain.ts</code> change along with <code>evaluation.ts</code>?</li>
+    <li>What does the <code>|</code> mean in the reason type?</li>
+  </ol>
+
+  <h2>Primary sources</h2>
+  <p>Use the official TypeScript Handbook sections on <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types">union types</a> and <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-types">literal types</a> for the new type syntax. The test uses Node's built-in <a href="https://nodejs.org/api/test.html">test runner</a>.</p>
+
+  <h2>Done when</h2>
+  <p>Five tests pass, type checking passes, assembly and application remain unchanged, and you can answer the three questions above without looking at the files.</p>
+
+  <div class="card">
+    <strong>Next:</strong><br>
+    Lesson 20 can replace the hard-coded value <code>10</code> with policy configuration passed through a clear dependency.
+  </div>
+
+  <p class="small">Ask me about any unfamiliar TypeScript syntax or test failure. Do not work around a compiler error until you can say what it is protecting.</p>
+  <p><a href="0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="../reference/typescript-first-slice.html">TypeScript first-slice quick reference</a> · <a href="../reference/use-case-routing.html">Use-case routing</a></p>
+</main>
+</body>
+</html>
