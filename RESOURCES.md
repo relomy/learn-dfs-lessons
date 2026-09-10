@@ -18,6 +18,12 @@
   Use for the function type passed into the application and the small wrapper that supplies evaluation policy.
 - [Node.js test runner](https://nodejs.org/api/test.html)
   Use for the built-in test function and command-line runner used by the executable slice.
+- [DraftKings total or over/under wager](https://help.draftkings.com/hc/en-us/articles/4405230607507-What-is-a-total-or-Over-Under-wager-US)
+  Use for the meaning of a game total line when deriving game context from Vegas data.
+- [DraftKings point spread bet](https://help.draftkings.com/hc/en-us/articles/4405230599955-What-is-a-point-spread-bet-US)
+  Use for the sign convention that identifies favorites and underdogs in a point spread.
+- [nflverse games data dictionary](https://github.com/nflverse/nfldata/blob/master/DATASETS.md#games)
+  Use for the free game-line fields and nflverse's documented spread convention.
 
 ## Wisdom
 
