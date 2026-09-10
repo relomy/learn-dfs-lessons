@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team context lookup: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Team context lookup</h1>
+  <p class="dek">Look up a team's game context without hiding an absent match.</p>
+
+  <h2>Contract</h2>
+  <pre><code>type TeamContextLookup =
+  | { readonly kind: "found"; readonly context: TeamGameContext }
+  | { readonly kind: "missing"; readonly team: string };</code></pre>
+
+  <h2>Function</h2>
+  <pre><code>findTeamGameContext(
+  team: string,
+  contexts: readonly TeamGameContext[],
+): TeamContextLookup</code></pre>
+
+  <h2>Caller pattern</h2>
+  <pre><code>const lookup = findTeamGameContext(candidate.team, contexts);
+
+if (lookup.kind === "found") {
+  use(lookup.context);
+} else {
+  reportMissing(lookup.team);
+}</code></pre>
+
+  <p>A missing lookup means no usable context was supplied for that team. It is not a pick'em and must not become a zero-valued context.</p>
+  <p class="small">Primary reading: TypeScript on <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">narrowing</a>.</p>
+  <p><a href="../lessons/0025-find-team-game-context.html">Lesson 25</a> · <a href="vegas-game-context.html">Vegas game context quick reference</a></p>
+</main>
+</body>
+</html>

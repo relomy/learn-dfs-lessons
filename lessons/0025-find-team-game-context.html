@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 25: Find team game context</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 25 · DFS analytics architecture</p>
+  <h1>Find team game context</h1>
+  <p class="dek">Match a candidate's team code to a game context, while making a missing match visible.</p>
+
+  <h2>A join may not succeed</h2>
+  <p>A quarterback with <code>team: &quot;HOU&quot;</code> should receive Houston's team context. But a slate may not contain Houston's game, or a source may use an inconsistent code. Returning <code>undefined</code> would make every caller invent its own missing-data behavior. Model the two possible outcomes instead.</p>
+
+  <pre><code>export type TeamContextLookup =
+  | { readonly kind: "found"; readonly context: TeamGameContext }
+  | { readonly kind: "missing"; readonly team: string };</code></pre>
+
+  <h2>Red: name both outcomes</h2>
+  <p>Add tests in <code>test/vegas.test.ts</code> for a function named <code>findTeamGameContext</code>. Use two contexts derived from the familiar BUF at HOU line.</p>
+
+  <p>The successful lookup should be exact:</p>
+  <pre><code>assert.deepEqual(findTeamGameContext("HOU", contexts), {
+  kind: "found",
+  context: {
+    team: "HOU",
+    opponent: "BUF",
+    gameTotal: 48,
+    impliedTeamTotal: 25.5,
+  },
+});</code></pre>
+
+  <p>Then describe a team absent from that game:</p>
+  <pre><code>assert.deepEqual(findTeamGameContext("DAL", contexts), {
+  kind: "missing",
+  team: "DAL",
+});</code></pre>
+
+  <h2>Green: one lookup, two explicit results</h2>
+  <p>Put the type and function in <code>src/vegas.ts</code>. The function takes only what it needs:</p>
+  <pre><code>export function findTeamGameContext(
+  team: string,
+  contexts: readonly TeamGameContext[],
+): TeamContextLookup</code></pre>
+  <p>Use <code>contexts.find</code> to look for a context with the same <code>team</code>. If it returns <code>undefined</code>, return the <code>missing</code> variant. Otherwise return the <code>found</code> variant and preserve the matched context.</p>
+
+  <h2>Use the result safely</h2>
+  <p>A later caller will pass <code>candidate.team</code>. Its branch on <code>kind</code> makes TypeScript narrow the union:</p>
+  <pre><code>const lookup = findTeamGameContext(candidate.team, contexts);
+
+if (lookup.kind === "missing") {
+  // lookup.team is available here
+} else {
+  // lookup.context is available here
+}</code></pre>
+  <p>Do not change <code>QuarterbackCandidate</code> or <code>evaluateQuarterback</code> in this lesson. You are building a lookup with an honest result, not deciding how context changes a score.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why is <code>missing</code> a better result than returning a zero-valued team context?</li>
+    <li>Why does <code>findTeamGameContext</code> take a team string rather than an nflverse row?</li>
+    <li>What does checking <code>lookup.kind</code> let TypeScript know?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read TypeScript's <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">narrowing guide</a>. A literal <code>kind</code> check lets TypeScript identify the properties available in each union branch.</p>
+
+  <h2>Done when</h2>
+  <p>One test finds Houston's context, one returns an explicit missing result for Dallas, and no missing lookup becomes a fake scoring projection.</p>
+
+  <p class="small">Ask if the <code>find</code> return type feels strange. It is the exact point where the result union earns its keep.</p>
+  <p><a href="0024-carry-team-identity-through-assembly.html">Lesson 24</a> · <a href="../reference/team-context-lookup.html">Team context lookup quick reference</a> · <a href="../reference/vegas-game-context.html">Vegas game context quick reference</a></p>
+</main>
+</body>
+</html>
