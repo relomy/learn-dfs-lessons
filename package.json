@@ -4,12 +4,17 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "format": "prettier --write src test package.json tsconfig.json",
+    "format:check": "prettier --check src test package.json tsconfig.json",
+    "prepare": "npm run setup-hooks",
+    "setup-hooks": "git config core.hooksPath .githooks",
     "start": "npm run build --silent && node dist/src/main.js",
     "test": "npm run build --silent && node --test dist/test/*.test.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",
+    "prettier": "^3.9.6",
     "typescript": "^7.0.2"
   }
 }

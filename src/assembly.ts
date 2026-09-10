@@ -1,7 +1,4 @@
-import type {
-  AssemblyResult,
-  NormalizedQuarterbackInput,
-} from "./domain.js";
+import type { AssemblyResult, NormalizedQuarterbackInput } from "./domain.js";
 
 export function assembleQuarterbackCandidate(
   input: NormalizedQuarterbackInput,
