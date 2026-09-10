@@ -11,6 +11,8 @@ import type {
 } from "../src/domain.js";
 import { evaluateQuarterback } from "../src/evaluation.js";
 
+const evaluationPolicy = { minimumPassingAttempts: 10 };
+
 const baseInput: NormalizedQuarterbackInput = {
   slateId: "nfl-week-1-main",
   displayName: "Example Quarterback",
@@ -25,7 +27,7 @@ function dependencyRecorder() {
   const reviews: Extract<AssemblyResult, { kind: "needs-review" }>[] = [];
   const diagnostics: Extract<AssemblyResult, { kind: "rejected" }>[] = [];
   const dependencies: ApplicationDependencies = {
-    evaluate: evaluateQuarterback,
+    evaluate: (candidate) => evaluateQuarterback(candidate, evaluationPolicy),
     enqueueReview: (result) => reviews.push(result),
     recordDiagnostic: (result) => diagnostics.push(result),
   };
@@ -107,4 +109,45 @@ test("Rejected reaches diagnostics", () => {
   });
   assert.equal(recorder.reviews.length, 0);
   assert.equal(recorder.diagnostics.length, 1);
+});
+
+test("Too few attempts are not evaluable", () => {
+  const recorder = dependencyRecorder();
+  const input: NormalizedQuarterbackInput = {
+    ...baseInput,
+    passingAttempts: { kind: "known", value: 7 },
+  };
+
+  const result = runQuarterbackEvaluation(input, recorder.dependencies);
+
+  assert.deepEqual(result, {
+    kind: "evaluation-complete",
+    evaluation: {
+      kind: "not-evaluable",
+      playerId: "player-1",
+      displayName: "Example Quarterback",
+      reason: "insufficient-attempts",
+    },
+  });
+});
+
+test("The policy supplies the minimum attempts", () => {
+  const recorder = dependencyRecorder();
+  const strictPolicy = { minimumPassingAttempts: 40 };
+  const dependencies: ApplicationDependencies = {
+    ...recorder.dependencies,
+    evaluate: (candidate) => evaluateQuarterback(candidate, strictPolicy),
+  };
+
+  const result = runQuarterbackEvaluation(baseInput, dependencies);
+
+  assert.deepEqual(result, {
+    kind: "evaluation-complete",
+    evaluation: {
+      kind: "not-evaluable",
+      playerId: "player-1",
+      displayName: "Example Quarterback",
+      reason: "insufficient-attempts",
+    },
+  });
 });

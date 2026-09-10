@@ -51,7 +51,19 @@ npm run typecheck # check types without emitting JavaScript</code></pre>
     <li>Provider parsing does not exist in this slice yet.</li>
   </ul>
 
-  <p><a href="../lessons/0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="../lessons/0019-change-an-evaluation-rule.html">Lesson 19</a> · <a href="use-case-routing.html">Use-case routing</a> · <a href="assembly-outcomes.html">Assembly outcomes</a></p>
+  <h2>Policy configuration</h2>
+  <pre><code>const evaluationPolicy = { minimumPassingAttempts: 10 };
+
+evaluate: (candidate) =&gt;
+  evaluateQuarterback(candidate, evaluationPolicy),</code></pre>
+  <p>The composition root chooses the policy value. The evaluator receives it as an argument. The application calls its <code>evaluate</code> dependency without knowing the threshold.</p>
+
+  <h2>Policy boundary test</h2>
+  <pre><code>attempts: 9  → not-evaluable
+attempts: 10 → scored</code></pre>
+  <p>Test the value immediately below a policy minimum and the minimum itself. Together, the tests catch using <code>&lt;=</code> when the rule requires <code>&lt;</code>.</p>
+
+  <p><a href="../lessons/0018-make-the-first-slice-executable.html">Lesson 18</a> · <a href="../lessons/0019-change-an-evaluation-rule.html">Lesson 19</a> · <a href="../lessons/0020-make-the-evaluation-policy-configurable.html">Lesson 20</a> · <a href="../lessons/0021-test-the-policy-boundary.html">Lesson 21</a> · <a href="use-case-routing.html">Use-case routing</a> · <a href="assembly-outcomes.html">Assembly outcomes</a></p>
 </main>
 </body>
 </html>

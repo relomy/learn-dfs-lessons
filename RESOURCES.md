@@ -14,6 +14,8 @@
   Use for discriminated unions, branch-specific type narrowing, and explicit result variants in the first executable slice.
 - [TypeScript everyday types](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html)
   Use for object annotations, union types, and literal types introduced during the first policy change.
+- [TypeScript functions](https://www.typescriptlang.org/docs/handbook/2/functions.html)
+  Use for the function type passed into the application and the small wrapper that supplies evaluation policy.
 - [Node.js test runner](https://nodejs.org/api/test.html)
   Use for the built-in test function and command-line runner used by the executable slice.
 

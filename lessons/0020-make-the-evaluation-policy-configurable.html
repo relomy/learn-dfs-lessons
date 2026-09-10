@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 20: Make the evaluation policy configurable</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 20 · DFS analytics architecture</p>
+  <h1>Make the evaluation policy configurable</h1>
+  <p class="dek">Replace a hidden threshold with an explicit policy value, without teaching assembly or routing about scoring rules.</p>
+
+  <h2>The problem</h2>
+  <p>Lesson 19 added a rule: fewer than 10 passing attempts means a quarterback is not evaluable. The rule belongs in the evaluator. The number <code>10</code> does not. It is a policy choice that will change as you compare slates, seasons, or scoring approaches.</p>
+
+  <div class="card">
+    <strong>Design question:</strong><br>
+    Which component chooses the minimum attempt count? Which component applies it? They are not the same component.
+  </div>
+
+  <h2>One small policy shape</h2>
+  <p>In <a href="../src/evaluation.ts"><code>src/evaluation.ts</code></a>, define the configuration the evaluator needs:</p>
+  <pre><code>export interface QuarterbackEvaluationPolicy {
+  readonly minimumPassingAttempts: number;
+}</code></pre>
+  <p>An interface names the required shape. The evaluator will accept any object with that property. The <code>readonly</code> marker says evaluation may read the threshold but may not change it.</p>
+
+  <h2>Red: prove the number is an input</h2>
+  <p>Add this test to <a href="../test/application.test.ts"><code>test/application.test.ts</code></a>. A quarterback with 35 attempts scores under the normal policy. Under a policy requiring 40 attempts, the same quarterback is not evaluable.</p>
+  <pre><code>test("The policy supplies the minimum attempts", () =&gt; {
+  const recorder = dependencyRecorder();
+  const strictPolicy = { minimumPassingAttempts: 40 };
+  const dependencies: ApplicationDependencies = {
+    ...recorder.dependencies,
+    evaluate: (candidate) =&gt; evaluateQuarterback(candidate, strictPolicy),
+  };
+
+  const result = runQuarterbackEvaluation(baseInput, dependencies);
+
+  assert.deepEqual(result, {
+    kind: "evaluation-complete",
+    evaluation: {
+      kind: "not-evaluable",
+      playerId: "player-1",
+      displayName: "Example Quarterback",
+      reason: "insufficient-attempts",
+    },
+  });
+});</code></pre>
+  <p>Run <code>npm test</code>. First, TypeScript should reject the extra policy argument because the evaluator's signature does not accept it yet. After you add the parameter in the next step, run the test again. It should then fail because the evaluator still compares against its hidden <code>10</code>.</p>
+
+  <h2>Green: pass the policy to the evaluator</h2>
+  <p>Change the evaluator signature:</p>
+  <pre><code>export function evaluateQuarterback(
+  candidate: QuarterbackCandidate,
+  policy: QuarterbackEvaluationPolicy,
+): EvaluationResult</code></pre>
+  <p>Then replace the hard-coded comparison with:</p>
+  <pre><code>if (candidate.passingAttempts.value &lt; policy.minimumPassingAttempts) {</code></pre>
+
+  <h2>Wire it once</h2>
+  <p>In <a href="../src/main.ts"><code>src/main.ts</code></a>, choose the policy next to the program's other assembled dependencies:</p>
+  <pre><code>const evaluationPolicy = { minimumPassingAttempts: 10 };
+
+const result = runQuarterbackEvaluation(input, {
+  evaluate: (candidate) =&gt; evaluateQuarterback(candidate, evaluationPolicy),
+  // other dependencies
+});</code></pre>
+  <p>The arrow function is a wrapper. It gives the application the one-argument <code>evaluate</code> function it expects, while supplying the evaluator's policy from the composition root.</p>
+
+  <h2>Check the boundary</h2>
+  <p>Run:</p>
+  <pre><code>npm run typecheck
+npm test
+git diff -- src/evaluation.ts src/main.ts test/application.test.ts</code></pre>
+  <p>You should have six passing tests. Do not change <code>src/domain.ts</code>, <code>src/application.ts</code>, <code>src/assembly.ts</code>, or <code>src/presentation.ts</code>. The policy belongs to the evaluator. Application routing should not need to know its threshold.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why is <code>minimumPassingAttempts</code> a policy value rather than a hard-coded evaluator detail?</li>
+    <li>Why does <code>main.ts</code> choose the policy while <code>evaluation.ts</code> applies it?</li>
+    <li>Why is the wrapper function in <code>main.ts</code> useful?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read the official TypeScript Handbook section on <a href="https://www.typescriptlang.org/docs/handbook/2/functions.html#function-type-expressions">function type expressions</a>. Connect <code>(candidate) =&gt; evaluateQuarterback(candidate, evaluationPolicy)</code> to the <code>evaluate</code> function type in <code>ApplicationDependencies</code>.</p>
+
+  <h2>Done when</h2>
+  <p>Six tests pass, type checking passes, changing the policy from 10 to 40 changes the evaluation outcome, and you can explain why application routing did not change.</p>
+
+  <p class="small">Ask me about the wrapper function or any type error before changing the design around it.</p>
+  <p><a href="0019-change-an-evaluation-rule.html">Lesson 19</a> · <a href="0021-test-the-policy-boundary.html">Lesson 21</a> · <a href="../reference/typescript-first-slice.html">TypeScript first-slice quick reference</a> · <a href="../reference/use-case-routing.html">Use-case routing</a></p>
+</main>
+</body>
+</html>

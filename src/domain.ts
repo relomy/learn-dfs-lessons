@@ -8,8 +8,7 @@ export interface Salary {
 }
 
 export type Observed<T> =
-  | { readonly kind: "known"; readonly value: T }
-  | { readonly kind: "unknown" };
+  { readonly kind: "known"; readonly value: T } | { readonly kind: "unknown" };
 
 export type IdentityResolution =
   | { readonly kind: "resolved"; readonly playerId: string }
@@ -59,11 +58,17 @@ export type EvaluationResult =
       readonly kind: "not-evaluable";
       readonly playerId: string;
       readonly displayName: string;
-      readonly reason: "missing-passing-data" | "no-passing-attempts";
+      readonly reason:
+        | "missing-passing-data"
+        | "no-passing-attempts"
+        | "insufficient-attempts";
     };
 
 export type ApplicationResult =
-  | { readonly kind: "evaluation-complete"; readonly evaluation: EvaluationResult }
+  | {
+      readonly kind: "evaluation-complete";
+      readonly evaluation: EvaluationResult;
+    }
   | { readonly kind: "review-queued"; readonly reason: "ambiguous-identity" }
   | {
       readonly kind: "rejection-recorded";

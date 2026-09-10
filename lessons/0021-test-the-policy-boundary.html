@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 21: Test the policy boundary</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 21 · DFS analytics architecture</p>
+  <h1>Test the policy boundary</h1>
+  <p class="dek">Prove that the evaluator excludes values below the minimum and includes the minimum itself.</p>
+
+  <h2>The boundary is the rule</h2>
+  <p>The policy says a quarterback needs at least 10 passing attempts. That sentence has two important examples:</p>
+  <pre><code>9 attempts  → not-evaluable
+10 attempts → scored</code></pre>
+  <p>Testing only 7 attempts proves that some low values are excluded. It does not prove whether 10 is included. The pair above does.</p>
+
+  <div class="card">
+    <strong>Prediction before code:</strong><br>
+    If the comparison accidentally becomes <code>&lt;=</code>, which test fails? Explain why before you run it.
+  </div>
+
+  <h2>Test the evaluator directly</h2>
+  <p>Create <a href="../test/evaluation.test.ts"><code>test/evaluation.test.ts</code></a>. This test does not need assembly, routing, or a dependency recorder. It asks the evaluator one focused question.</p>
+  <pre><code>import assert from "node:assert/strict";
+import test from "node:test";
+
+import type { QuarterbackCandidate } from "../src/domain.js";
+import { evaluateQuarterback } from "../src/evaluation.js";
+
+const policy = { minimumPassingAttempts: 10 };
+const baseCandidate: QuarterbackCandidate = {
+  playerId: "player-1",
+  slateId: "nfl-week-1-main",
+  displayName: "Example Quarterback",
+  salary: { cents: 740000 },
+  passingYards: { kind: "known", value: 280 },
+  passingAttempts: { kind: "known", value: 10 },
+};</code></pre>
+
+  <h2>Add the two examples</h2>
+  <pre><code>test("Attempts below the minimum are not evaluable", () =&gt; {
+  const candidate: QuarterbackCandidate = {
+    ...baseCandidate,
+    passingAttempts: { kind: "known", value: 9 },
+  };
+
+  assert.deepEqual(evaluateQuarterback(candidate, policy), {
+    kind: "not-evaluable",
+    playerId: "player-1",
+    displayName: "Example Quarterback",
+    reason: "insufficient-attempts",
+  });
+});
+
+test("The minimum number of attempts is evaluable", () =&gt; {
+  assert.deepEqual(evaluateQuarterback(baseCandidate, policy), {
+    kind: "scored",
+    playerId: "player-1",
+    displayName: "Example Quarterback",
+    yardsPerAttempt: 28,
+  });
+});</code></pre>
+
+  <h2>Use the feedback loop</h2>
+  <p>Run <code>npm test</code>. Both tests should pass. Then, only as an experiment, change this line in <a href="../src/evaluation.ts"><code>src/evaluation.ts</code></a>:</p>
+  <pre><code>candidate.passingAttempts.value &lt; policy.minimumPassingAttempts</code></pre>
+  <p>to:</p>
+  <pre><code>candidate.passingAttempts.value &lt;= policy.minimumPassingAttempts</code></pre>
+  <p>Run <code>npm test</code> again. The 10-attempt test should fail. Restore <code>&lt;</code> when you finish.</p>
+
+  <h2>Why this test belongs here</h2>
+  <p>The application test from Lesson 20 proves that application wiring supplies a chosen policy. This new test proves the evaluator's own behavior. Both test different things. A direct test makes the policy rule easier to read and faster to diagnose.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why do you need both the 9-attempt and 10-attempt examples?</li>
+    <li>Why does changing <code>&lt;</code> to <code>&lt;=</code> break only one of those tests?</li>
+    <li>Why does this test call <code>evaluateQuarterback</code> directly instead of <code>runQuarterbackEvaluation</code>?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read the official <a href="https://nodejs.org/api/test.html">Node.js test runner</a> documentation. Focus on the <code>test</code> function and the assertion failure output, which tells you which expected behavior changed.</p>
+
+  <h2>Done when</h2>
+  <p>Eight tests pass, type checking passes, and you can explain why the exact minimum belongs on the scoring side of the boundary.</p>
+
+  <p class="small">Ask me about the failure before restoring the comparison. The failing test is evidence about the rule, not an obstacle to work around.</p>
+  <p><a href="0019-change-an-evaluation-rule.html">Lesson 19</a> · <a href="0020-make-the-evaluation-policy-configurable.html">Lesson 20</a> · <a href="../reference/typescript-first-slice.html">TypeScript first-slice quick reference</a></p>
+</main>
+</body>
+</html>

@@ -1,10 +1,12 @@
-import type {
-  EvaluationResult,
-  QuarterbackCandidate,
-} from "./domain.js";
+import type { EvaluationResult, QuarterbackCandidate } from "./domain.js";
+
+export interface QuarterbackEvaluationPolicy {
+  readonly minimumPassingAttempts: number;
+}
 
 export function evaluateQuarterback(
   candidate: QuarterbackCandidate,
+  policy: QuarterbackEvaluationPolicy,
 ): EvaluationResult {
   if (
     candidate.passingYards.kind === "unknown" ||
@@ -24,6 +26,15 @@ export function evaluateQuarterback(
       playerId: candidate.playerId,
       displayName: candidate.displayName,
       reason: "no-passing-attempts",
+    };
+  }
+
+  if (candidate.passingAttempts.value < policy.minimumPassingAttempts) {
+    return {
+      kind: "not-evaluable",
+      playerId: candidate.playerId,
+      displayName: candidate.displayName,
+      reason: "insufficient-attempts",
     };
   }
 

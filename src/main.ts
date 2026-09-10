@@ -3,6 +3,8 @@ import type { NormalizedQuarterbackInput } from "./domain.js";
 import { evaluateQuarterback } from "./evaluation.js";
 import { presentApplicationResult } from "./presentation.js";
 
+const evaluationPolicy = { minimumPassingAttempts: 10 };
+
 const input: NormalizedQuarterbackInput = {
   slateId: "nfl-week-1-main",
   displayName: "Example Quarterback",
@@ -14,7 +16,7 @@ const input: NormalizedQuarterbackInput = {
 };
 
 const result = runQuarterbackEvaluation(input, {
-  evaluate: evaluateQuarterback,
+  evaluate: (candidate) => evaluateQuarterback(candidate, evaluationPolicy),
   enqueueReview: () => undefined,
   recordDiagnostic: () => undefined,
 });
