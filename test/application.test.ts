@@ -16,6 +16,7 @@ const evaluationPolicy = { minimumPassingAttempts: 10 };
 const baseInput: NormalizedQuarterbackInput = {
   slateId: "nfl-week-1-main",
   displayName: "Example Quarterback",
+  team: "HOU",
   source: { provider: "lesson-fixture", recordId: "qb-1" },
   identity: { kind: "resolved", playerId: "player-1" },
   salaryDollars: { kind: "known", value: 7400 },

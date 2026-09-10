@@ -22,6 +22,7 @@ export interface NormalizedQuarterbackInput {
   readonly salaryDollars: Observed<number>;
   readonly passingYards: Observed<number>;
   readonly passingAttempts: Observed<number>;
+  readonly team: string;
 }
 
 export interface QuarterbackCandidate {
@@ -31,6 +32,7 @@ export interface QuarterbackCandidate {
   readonly salary: Salary;
   readonly passingYards: Observed<number>;
   readonly passingAttempts: Observed<number>;
+  readonly team: string;
 }
 
 export type AssemblyResult =

@@ -37,6 +37,7 @@ export function assembleQuarterbackCandidate(
       playerId: input.identity.playerId,
       slateId: input.slateId,
       displayName: input.displayName,
+      team: input.team,
       salary: { cents: input.salaryDollars.value * 100 },
       passingYards: input.passingYards,
       passingAttempts: input.passingAttempts,

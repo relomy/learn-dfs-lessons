@@ -9,6 +9,7 @@ const baseCandidate: QuarterbackCandidate = {
   playerId: "player-1",
   slateId: "nfl-week-1-main",
   displayName: "Example Quarterback",
+  team: "HOU",
   salary: { cents: 740000 },
   passingYards: { kind: "known", value: 280 },
   passingAttempts: { kind: "known", value: 10 },
