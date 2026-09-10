@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate team identity: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Candidate team identity</h1>
+  <p class="dek">A team code is the join key between a quarterback and team-level game context.</p>
+
+  <h2>Carry it through assembly</h2>
+  <pre><code>NormalizedQuarterbackInput.team
+  → QuarterbackCandidate.team
+  → later: TeamGameContext.team</code></pre>
+
+  <h2>What changes now</h2>
+  <p>Require <code>team: string</code> on normalized input and on the assembled candidate. Update each complete input fixture. Copy the value in <code>assembleQuarterbackCandidate</code>.</p>
+
+  <h2>What does not change</h2>
+  <p>The evaluator has no team-dependent rule yet, so its input and output stay unchanged. Do not add provider-specific team names to domain types.</p>
+
+  <p class="small">Primary reading: TypeScript on <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#object-types">object types</a>.</p>
+  <p><a href="../lessons/0024-carry-team-identity-through-assembly.html">Lesson 24</a> · <a href="candidate-assembly.html">Candidate assembly quick reference</a></p>
+</main>
+</body>
+</html>

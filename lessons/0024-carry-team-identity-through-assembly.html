@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 24: Carry team identity through assembly</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 24 · DFS analytics architecture</p>
+  <h1>Carry team identity through assembly</h1>
+  <p class="dek">Give a quarterback candidate the team code it needs to receive team-level context later.</p>
+
+  <h2>The missing join key</h2>
+  <p>You can now turn an nflverse row into two <code>TeamGameContext</code> values. But a <code>QuarterbackCandidate</code> has no team, so there is no way to select the context that belongs to that quarterback.</p>
+  <div class="pipeline" aria-label="Data flow">
+    <div class="pipeline-step">Normalized QB input<br><code>team: &quot;HOU&quot;</code></div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">Quarterback candidate<br><code>team: &quot;HOU&quot;</code></div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">Later: match team context</div>
+  </div>
+
+  <h2>Make team part of the domain contract</h2>
+  <p>In <code>src/domain.ts</code>, add the same field to both interfaces:</p>
+  <pre><code>export interface NormalizedQuarterbackInput {
+  // existing fields
+  readonly team: string;
+}
+
+export interface QuarterbackCandidate {
+  // existing fields
+  readonly team: string;
+}</code></pre>
+  <p>Use the existing three-letter code convention for this lesson. We can model a stronger team-code type only when the application needs validation or translation across providers.</p>
+
+  <h2>Red: test direct assembly</h2>
+  <p>Create <code>test/assembly.test.ts</code>. Start with a complete <code>NormalizedQuarterbackInput</code> using <code>team: &quot;HOU&quot;</code>. Call <code>assembleQuarterbackCandidate</code> directly.</p>
+  <p>Assert the ready result includes the team:</p>
+  <pre><code>assert.deepEqual(result, {
+  kind: "ready",
+  candidate: {
+    playerId: "player-1",
+    slateId: "nfl-week-1-main",
+    displayName: "Example Quarterback",
+    team: "HOU",
+    salary: { cents: 740000 },
+    passingYards: { kind: "known", value: 280 },
+    passingAttempts: { kind: "known", value: 35 },
+  },
+});</code></pre>
+  <p>Run <code>npm test</code>. The compiler will point out every existing normalized-input fixture that must now state a team. That is useful. The type made a new required domain fact visible everywhere it enters the application.</p>
+
+  <h2>Green: preserve the value</h2>
+  <p>In <code>assembleQuarterbackCandidate</code>, copy <code>input.team</code> onto the ready candidate. Then add <code>team</code> to the input fixture in <code>src/main.ts</code> and every test fixture that creates a complete <code>NormalizedQuarterbackInput</code>.</p>
+
+  <h2>Keep this change small</h2>
+  <p>Do not add a team to <code>EvaluationResult</code>, and do not change <code>evaluateQuarterback</code>. The evaluator does not use team identity yet. Carrying a fact through the candidate is enough to unlock the next join.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why is team identity needed on a quarterback candidate before we can use team game context?</li>
+    <li>Why does TypeScript force updates to every complete input fixture after this field becomes required?</li>
+    <li>Why should the evaluator remain unchanged in this lesson?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read TypeScript's <a href="https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#object-types">object-types guide</a>. Required object properties are the compiler's way of keeping every construction site honest.</p>
+
+  <h2>Done when</h2>
+  <p>A ready candidate carries <code>team: &quot;HOU&quot;</code>, all fixtures compile with an explicit team, and the evaluator's API has not changed.</p>
+
+  <p class="small">Ask if the compiler reports an object that looks unrelated. It is showing another place that constructs the domain contract.</p>
+  <p><a href="0023-adapt-an-nflverse-game-line.html">Lesson 23</a> · <a href="../reference/candidate-team-identity.html">Candidate team identity quick reference</a> · <a href="../reference/candidate-assembly.html">Candidate assembly quick reference</a></p>
+</main>
+</body>
+</html>
