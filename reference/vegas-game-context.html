@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vegas game context: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Vegas game context</h1>
+  <p class="dek">Turn a game total and a signed home-team spread into one context for each team.</p>
+
+  <h2>Input</h2>
+  <pre><code>away team: BUF
+home team: HOU
+game total: 48
+home spread: -3</code></pre>
+  <p>A negative home spread means the home team is favored. A game total is the expected combined score.</p>
+
+  <h2>Formula</h2>
+  <pre><code>home implied total = game total / 2 - home spread / 2
+away implied total = game total / 2 + home spread / 2</code></pre>
+  <p>For the example above, Houston has 25.5 implied points and Buffalo has 22.5. The two implied totals must add back up to 48.</p>
+
+  <h2>Checks</h2>
+  <ul>
+    <li>A negative home spread gives the home team the larger implied total.</li>
+    <li>A zero spread gives both teams half the game total.</li>
+    <li>The two implied totals add up to the game total.</li>
+  </ul>
+
+  <h2>What it means for QB evaluation</h2>
+  <p>Game total describes the scoring environment. Implied team total describes how much of that scoring the QB's team is expected to supply. Both are context signals, not a complete player ranking.</p>
+
+  <p class="small">Primary reading: DraftKings on <a href="https://help.draftkings.com/hc/en-us/articles/4405230607507-What-is-a-total-or-Over-Under-wager-US">totals</a> and <a href="https://help.draftkings.com/hc/en-us/articles/4405230599955-What-is-a-point-spread-bet-US">point spreads</a>.</p>
+  <p><a href="../lessons/0022-turn-vegas-lines-into-team-context.html">Lesson 22</a></p>
+</main>
+</body>
+</html>

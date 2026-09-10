@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 22: Turn Vegas lines into team context</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 22 · DFS analytics architecture</p>
+  <h1>Turn Vegas lines into team context</h1>
+  <p class="dek">Derive a game total and an implied team total for each offense from one Vegas line.</p>
+
+  <h2>The data we need</h2>
+  <p>A game total captures the expected combined scoring environment. A point spread divides that expectation between the two teams. For the first exercise, work with this captured line rather than choosing a live provider yet:</p>
+  <pre><code>const line = {
+  awayTeam: "BUF",
+  homeTeam: "HOU",
+  gameTotal: 48,
+  homeSpread: -3,
+};</code></pre>
+  <p>A negative home spread means Houston is favored by three points.</p>
+
+  <div class="card">
+    <strong>Prediction before code:</strong><br>
+    Which team should receive the larger implied total, and what two numbers should the function return?
+  </div>
+
+  <h2>Derive both team contexts</h2>
+  <p>Create <a href="../src/vegas.ts"><code>src/vegas.ts</code></a>. Keep the source-specific format outside this module. Its input is the small domain-shaped line we need for the calculation.</p>
+  <pre><code>export interface VegasGameLine {
+  readonly awayTeam: string;
+  readonly homeTeam: string;
+  readonly gameTotal: number;
+  readonly homeSpread: number;
+}
+
+export interface TeamGameContext {
+  readonly team: string;
+  readonly opponent: string;
+  readonly gameTotal: number;
+  readonly impliedTeamTotal: number;
+}</code></pre>
+  <p>Return the away-team context first, then the home-team context. A fixed order makes tests simple.</p>
+
+  <h2>Red: describe the home-favorite case</h2>
+  <p>Create <a href="../test/vegas.test.ts"><code>test/vegas.test.ts</code></a> and write this test before the function exists:</p>
+  <pre><code>import assert from "node:assert/strict";
+import test from "node:test";
+
+import { deriveTeamContexts } from "../src/vegas.js";
+
+test("A home favorite receives the larger implied total", () =&gt; {
+  assert.deepEqual(
+    deriveTeamContexts({
+      awayTeam: "BUF",
+      homeTeam: "HOU",
+      gameTotal: 48,
+      homeSpread: -3,
+    }),
+    [
+      {
+        team: "BUF",
+        opponent: "HOU",
+        gameTotal: 48,
+        impliedTeamTotal: 22.5,
+      },
+      {
+        team: "HOU",
+        opponent: "BUF",
+        gameTotal: 48,
+        impliedTeamTotal: 25.5,
+      },
+    ],
+  );
+});</code></pre>
+  <p>Run <code>npm test</code>. TypeScript should fail because the module has not been created. That is useful red feedback. The test has named the contract you need to build.</p>
+
+  <h2>Green: use the line equations</h2>
+  <p>Add <code>deriveTeamContexts</code> in <code>src/vegas.ts</code>. Use these equations:</p>
+  <pre><code>home implied total = game total / 2 - home spread / 2
+away implied total = game total / 2 + home spread / 2</code></pre>
+  <p>With a home spread of <code>-3</code>, Houston receives three points more than an even split and Buffalo receives three fewer.</p>
+
+  <h2>Strengthen the boundary</h2>
+  <p>Add two more tests:</p>
+  <ol>
+    <li>A pick'em game, with <code>homeSpread: 0</code>, gives each team half the total.</li>
+    <li>The two implied totals add up to the game total.</li>
+  </ol>
+  <p>The second test protects the relationship between the values. It is stronger than checking a second arbitrary example.</p>
+
+  <h2>What this does and does not say</h2>
+  <p>A high game total and a high implied team total describe a favorable offensive environment. They do not predict passing production by themselves. Rushing touchdowns, defense, and other players can produce points too.</p>
+  <p>The next integration will attach this context to a quarterback. That will require team and matchup information on the candidate, plus a real source adapter that translates provider data into <code>VegasGameLine</code>.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why does a negative home spread increase the home team's implied total?</li>
+    <li>Why must the two implied totals add back up to the game total?</li>
+    <li>Why is a favorable scoring environment useful context but not a complete QB ranking?</li>
+  </ol>
+
+  <h2>Primary sources</h2>
+  <p>Read DraftKings' explanations of a <a href="https://help.draftkings.com/hc/en-us/articles/4405230607507-What-is-a-total-or-Over-Under-wager-US">game total</a> and a <a href="https://help.draftkings.com/hc/en-us/articles/4405230599955-What-is-a-point-spread-bet-US">point spread</a>. The formulas in this lesson are the two equations that satisfy both values at once.</p>
+
+  <h2>Done when</h2>
+  <p>Your three Vegas tests pass, type checking passes, and you can explain why the derived team totals preserve the original game total.</p>
+
+  <p class="small">Ask about the spread sign before changing the formula. A reversed sign produces plausible-looking numbers for the wrong team.</p>
+  <p><a href="0021-test-the-policy-boundary.html">Lesson 21</a> · <a href="../reference/vegas-game-context.html">Vegas game context quick reference</a> · <a href="../reference/typescript-first-slice.html">TypeScript first-slice quick reference</a></p>
+</main>
+</body>
+</html>

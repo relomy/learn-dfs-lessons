@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 23: Adapt an nflverse game line</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 23 · DFS analytics architecture</p>
+  <h1>Adapt an nflverse game line</h1>
+  <p class="dek">Translate one free provider record into the domain input that Lesson 22 already understands.</p>
+
+  <h2>Keep the boundary honest</h2>
+  <p>nflverse publishes a free game CSV with <code>away_team</code>, <code>home_team</code>, <code>spread_line</code>, and <code>total_line</code>. Its spread convention is the reverse of ours: a positive <code>spread_line</code> means the home team is favored. In our <code>VegasGameLine</code>, a negative <code>homeSpread</code> means the home team is favored.</p>
+
+  <div class="card">
+    <strong>Your job:</strong><br>
+    Make that sign change once, at the provider boundary. Do not make <code>deriveTeamContexts</code> learn nflverse's convention.
+  </div>
+
+  <h2>Start with a captured provider record</h2>
+  <p>Create <code>src/nflverse.ts</code>. This interface belongs to the adapter because these are nflverse column names, not names the rest of the application should need to know.</p>
+  <pre><code>import { type VegasGameLine } from "./vegas.js";
+
+export interface NflverseGameRow {
+  readonly away_team: string;
+  readonly home_team: string;
+  readonly spread_line: number | null;
+  readonly total_line: number | null;
+}</code></pre>
+  <p>Use this fixture in the test. It represents an nflverse row where the home team is favored by three:</p>
+  <pre><code>const row: NflverseGameRow = {
+  away_team: "BUF",
+  home_team: "HOU",
+  spread_line: 3,
+  total_line: 48,
+};</code></pre>
+
+  <h2>Red: state the translation</h2>
+  <p>Create <code>test/nflverse.test.ts</code>. Before implementing anything, write a test for a function named <code>toVegasGameLine</code>:</p>
+  <pre><code>assert.deepEqual(toVegasGameLine(row), {
+  awayTeam: "BUF",
+  homeTeam: "HOU",
+  gameTotal: 48,
+  homeSpread: -3,
+});</code></pre>
+  <p>Run <code>npm test</code>. The missing function is the useful red result.</p>
+
+  <h2>Green: translate, do not calculate</h2>
+  <p>Implement <code>toVegasGameLine</code>. It should return a <code>VegasGameLine</code> and do only these four mappings:</p>
+  <pre><code>awayTeam: row.away_team
+homeTeam: row.home_team
+gameTotal: row.total_line
+homeSpread: -row.spread_line</code></pre>
+  <p>TypeScript will make you face the two nullable line fields. Decide how this adapter reports an incomplete source row. Do not silently turn a missing line into zero. A thrown error is acceptable for this small slice; a result union may be useful later if callers need to recover.</p>
+
+  <h2>Strengthen the test</h2>
+  <ol>
+    <li>Add an away-favorite row. Its negative <code>spread_line</code> must become a positive <code>homeSpread</code>.</li>
+    <li>Add a missing-total or missing-spread case. Assert the behavior you chose.</li>
+    <li>Pass the successful adapter result into <code>deriveTeamContexts</code> in one small integration test. Houston should receive the larger implied total in the fixture above.</li>
+  </ol>
+
+  <h2>Why this source is first</h2>
+  <p>It is public, free, and repeatable, which makes it a good source for learning and backtesting. It is not a promise of live odds. Scheduled future rows may exist before either line is populated. A live provider can become a separate adapter later without changing this translator or the derived-context calculation.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why is <code>NflverseGameRow</code> defined in the adapter rather than <code>vegas.ts</code>?</li>
+    <li>Why does <code>homeSpread: -row.spread_line</code> belong in exactly one place?</li>
+    <li>Why is a missing line different from a line of zero?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Read nflverse's <a href="https://github.com/nflverse/nfldata/blob/master/DATASETS.md#games">games data dictionary</a>. It defines the game columns and documents the provider's spread sign convention.</p>
+
+  <h2>Done when</h2>
+  <p>Your adapter tests pass, missing lines cannot become a zero-valued game, and you can trace the one sign conversion from the provider record to <code>VegasGameLine</code>.</p>
+
+  <p class="small">Ask before adding a live endpoint. We will decide whether its instability belongs behind a separate adapter.</p>
+  <p><a href="0022-turn-vegas-lines-into-team-context.html">Lesson 22</a> · <a href="../reference/nflverse-game-lines.html">nflverse game lines quick reference</a> · <a href="../reference/vegas-game-context.html">Vegas game context quick reference</a></p>
+</main>
+</body>
+</html>

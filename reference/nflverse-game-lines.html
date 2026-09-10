@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nflverse game lines: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>nflverse game lines</h1>
+  <p class="dek">Provider vocabulary stays at the boundary.</p>
+
+  <h2>Fields we need</h2>
+  <pre><code>away_team
+home_team
+spread_line
+total_line</code></pre>
+
+  <h2>Sign conversion</h2>
+  <p>nflverse uses a positive <code>spread_line</code> when the home team is favored. Our domain uses a negative <code>homeSpread</code> when the home team is favored.</p>
+  <pre><code>VegasGameLine.homeSpread = -NflverseGameRow.spread_line
+VegasGameLine.gameTotal = NflverseGameRow.total_line</code></pre>
+
+  <h2>Missing is not zero</h2>
+  <p>A missing <code>spread_line</code> or <code>total_line</code> means the source did not supply a usable line. A value of zero is a real pick'em spread. Reject or explicitly report missing data at the adapter boundary.</p>
+
+  <h2>Scope</h2>
+  <p>The public CSV is a good historical and backtesting source. Do not treat scheduled rows with blank line fields as live odds.</p>
+
+  <p class="small">Primary reading: nflverse <a href="https://github.com/nflverse/nfldata/blob/master/DATASETS.md#games">games data dictionary</a>.</p>
+  <p><a href="../lessons/0023-adapt-an-nflverse-game-line.html">Lesson 23</a> · <a href="vegas-game-context.html">Vegas game context quick reference</a></p>
+</main>
+</body>
+</html>
