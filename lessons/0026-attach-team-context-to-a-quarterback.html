@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson 26: Attach team context to a quarterback</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Lesson 26 · DFS analytics architecture</p>
+  <h1>Attach team context to a quarterback</h1>
+  <p class="dek">Combine a candidate and its matched game context into one value that later policy can use.</p>
+
+  <h2>Compose the two prior steps</h2>
+  <p>Lesson 24 gave the quarterback a team code. Lesson 25 looks up that team in the two contexts derived from a game line. This lesson names the useful result of a successful match: a quarterback with the game context relevant to their team.</p>
+  <div class="pipeline" aria-label="Context enrichment flow">
+    <div class="pipeline-step">Quarterback candidate<br><code>team: &quot;HOU&quot;</code></div>
+    <div class="pipeline-arrow">+</div>
+    <div class="pipeline-step">Team contexts<br><code>BUF, HOU</code></div>
+    <div class="pipeline-arrow">→</div>
+    <div class="pipeline-step">QB context result</div>
+  </div>
+
+  <h2>Name the result</h2>
+  <p>Create <code>src/quarterback-context.ts</code>. Its public result keeps both outcomes explicit:</p>
+  <pre><code>export type QuarterbackContextResult =
+  | {
+      readonly kind: "context-ready";
+      readonly candidate: QuarterbackCandidate;
+      readonly gameContext: TeamGameContext;
+    }
+  | {
+      readonly kind: "missing-game-context";
+      readonly candidate: QuarterbackCandidate;
+      readonly team: string;
+    };</code></pre>
+  <p>The candidate appears in both variants. Even when context is missing, we still know which quarterback needs attention.</p>
+
+  <h2>Red: describe the successful pairing</h2>
+  <p>Create <code>test/quarterback-context.test.ts</code>. Use a complete HOU quarterback candidate and contexts derived from BUF at HOU with a total of 48 and a home spread of -3.</p>
+  <p>Write a test for <code>attachTeamGameContext(candidate, contexts)</code> that expects:</p>
+  <pre><code>{
+  kind: "context-ready",
+  candidate,
+  gameContext: {
+    team: "HOU",
+    opponent: "BUF",
+    gameTotal: 48,
+    impliedTeamTotal: 25.5,
+  },
+}</code></pre>
+
+  <h2>Then describe the missing match</h2>
+  <p>Use the same two contexts with a candidate whose <code>team</code> is <code>&quot;DAL&quot;</code>. Expect:</p>
+  <pre><code>{
+  kind: "missing-game-context",
+  candidate,
+  team: "DAL",
+}</code></pre>
+  <p>Run <code>npm test</code>. The missing module or function is the useful red feedback.</p>
+
+  <h2>Green: map the lookup result</h2>
+  <p>Import <code>findTeamGameContext</code> and call it with <code>candidate.team</code>. Branch on <code>lookup.kind</code>:</p>
+  <pre><code>const lookup = findTeamGameContext(candidate.team, contexts);
+
+if (lookup.kind === "missing") {
+  return {
+    kind: "missing-game-context",
+    candidate,
+    team: lookup.team,
+  };
+}
+
+return {
+  kind: "context-ready",
+  candidate,
+  gameContext: lookup.context,
+};</code></pre>
+  <p>This function returns a new value. It does not mutate <code>candidate</code> or add a context field to the existing candidate type.</p>
+
+  <h2>Why keep the evaluator unchanged?</h2>
+  <p>Context availability and context scoring are different decisions. This lesson makes context available to a future policy. The next lesson can decide which concrete game-total or implied-total rule belongs in that policy.</p>
+
+  <h2>Explain the result</h2>
+  <ol>
+    <li>Why does the missing-context result keep the candidate as well as the missing team?</li>
+    <li>Why does this function return a new result instead of mutating <code>QuarterbackCandidate</code>?</li>
+    <li>Why is it useful to separate attaching context from deciding whether that context is favorable?</li>
+  </ol>
+
+  <h2>Primary source</h2>
+  <p>Revisit TypeScript's <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">narrowing guide</a>. The lookup result narrows into the two return shapes in this function.</p>
+
+  <h2>Done when</h2>
+  <p>The HOU candidate receives Houston's 25.5 implied total, the DAL candidate gets an explicit missing-context result, and <code>QuarterbackCandidate</code> itself has not changed.</p>
+
+  <p class="small">Ask if the repeated <code>candidate</code> field feels odd. It is intentional evidence about which player the outcome concerns.</p>
+  <p><a href="0025-find-team-game-context.html">Lesson 25</a> · <a href="../reference/quarterback-context-result.html">Quarterback context result quick reference</a> · <a href="../reference/team-context-lookup.html">Team context lookup quick reference</a></p>
+</main>
+</body>
+</html>

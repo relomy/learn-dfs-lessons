@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quarterback context result: quick reference</title>
+  <link rel="stylesheet" href="../assets/styles.css">
+</head>
+<body>
+<main>
+  <p class="small">Quick reference · DFS analytics architecture</p>
+  <h1>Quarterback context result</h1>
+  <p class="dek">Attach matched team game context to a candidate without changing the candidate itself.</p>
+
+  <h2>Outcomes</h2>
+  <pre><code>context-ready
+  candidate: QuarterbackCandidate
+  gameContext: TeamGameContext
+
+missing-game-context
+  candidate: QuarterbackCandidate
+  team: string</code></pre>
+
+  <h2>Flow</h2>
+  <pre><code>candidate.team
+  → findTeamGameContext(candidate.team, contexts)
+  → QuarterbackContextResult</code></pre>
+
+  <h2>Boundary</h2>
+  <p>Attaching context says which context belongs to a quarterback. It does not say whether that context is favorable, and it does not change the evaluator yet.</p>
+
+  <p class="small">Primary reading: TypeScript on <a href="https://www.typescriptlang.org/docs/handbook/2/narrowing.html">narrowing</a>.</p>
+  <p><a href="../lessons/0026-attach-team-context-to-a-quarterback.html">Lesson 26</a> · <a href="team-context-lookup.html">Team context lookup quick reference</a></p>
+</main>
+</body>
+</html>
